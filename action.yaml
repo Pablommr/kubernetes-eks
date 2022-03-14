@@ -1,0 +1,10 @@
+
+name: kubernetes-eks
+description: "Apply yaml file in kubernetes cluster"
+author: 'Pablo M Marques'
+branding:
+  icon: 'anchor'  
+  color: 'blue'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

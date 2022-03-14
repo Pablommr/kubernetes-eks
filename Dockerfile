@@ -1,0 +1,13 @@
+FROM ubuntu:22.04
+
+RUN apt-get update -y && \
+    apt-get install unzip curl -y && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \    
+    curl -LO https://dl.k8s.io/release/v1.23.0/bin/linux/amd64/kubectl && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
