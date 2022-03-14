@@ -1,4 +1,4 @@
-# kubectl-eks
+# kubernetes-eks
 
 Action to apply artifacts files in your [EKS](https://aws.amazon.com/pt/eks/) cluster.
 
@@ -22,7 +22,7 @@ on:
         uses: actions/checkout@v2
       -
         name: Deployment
-        uses: Pablommr/kubectl-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.0.0
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -128,17 +128,17 @@ env:
         uses: actions/checkout@v2
       -
         name: Service
-        uses: Pablommr/kubectl-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.0.0
         env:
           KUBE_YAML: kubernetes/service.yml
       -
         name: Configmap
-        uses: Pablommr/kubectl-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.0.0
         env:
           KUBE_YAML: kubernetes/configmap.yml
       -
         name: Deployment
-        uses: Pablommr/kubectl-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.0.0
         env:
           KUBE_YAML: kubernetes/deployment.yml
           ENVSUBST: true
