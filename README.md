@@ -145,3 +145,15 @@ env:
           KUBE_ROLLOUT: true
           IMAGE_TAG: 1.21.6
 ```
+
+<br>
+
+# Change Log
+
+## v1.1.0
+
+- Add otpion to KUBE_ROLLOUT follow the rollout status in Action page
+- Fix metacharacter replacement in ENVSUBST
+
+## v1.0.0
+- Project started
