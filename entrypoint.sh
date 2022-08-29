@@ -69,10 +69,12 @@ if [ "$KUBE_ROLLOUT" == true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unc
   echo ""
   echo "Applying rollout:"
   kubectl rollout restart --filename $KUBE_YAML
+  echo ""
+  echo "Checking rollout status:"
   kubectl rollout status --filename $KUBE_YAML
 elif [ "$KUBE_ROLLOUT" = true ] && ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
   echo ""
-  echo "Applying rollout:"
+  echo "Checking rollout status:"
   kubectl rollout status --filename $KUBE_YAML
 fi
 
