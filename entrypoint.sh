@@ -70,7 +70,7 @@ if [ "$KUBE_ROLLOUT" = true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" = unchan
   echo "Applying rollout:"
   kubectl rollout restart --filename $KUBE_YAML
   kubectl rollout status --filename $KUBE_YAML
-elif [ "$KUBE_ROLLOUT" = true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" = configured ] || [ "$KUBE_ROLLOUT" = true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" = created ]; then 
+elif [ "$KUBE_ROLLOUT" = true ] && [[ "$(echo $KUBE_APPLY |sed 's/.* //')" = configured ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" = created ]]; then 
   echo ""
   echo "Applying rollout:"
   kubectl rollout status --filename $KUBE_YAML
