@@ -14,15 +14,16 @@ on:
   push:
     branches: [ main ]
 
+jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Deployment
-        uses: Pablommr/kubernetes-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.1.0
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -119,26 +120,27 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
+jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push
     steps:
       -
         name: Checkout 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Service
-        uses: Pablommr/kubernetes-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.1.0
         env:
           KUBE_YAML: kubernetes/service.yml
       -
         name: Configmap
-        uses: Pablommr/kubernetes-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.1.0
         env:
           KUBE_YAML: kubernetes/configmap.yml
       -
         name: Deployment
-        uses: Pablommr/kubernetes-eks@v1.0.0
+        uses: Pablommr/kubernetes-eks@v1.1.0
         env:
           KUBE_YAML: kubernetes/deployment.yml
           ENVSUBST: true
