@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Deployment
-        uses: Pablommr/kubernetes-eks@v1.1.0
+        uses: Pablommr/kubernetes-eks@v1.2.0
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -130,17 +130,17 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Service
-        uses: Pablommr/kubernetes-eks@v1.1.0
+        uses: Pablommr/kubernetes-eks@v1.2.0
         env:
           KUBE_YAML: kubernetes/service.yml
       -
         name: Configmap
-        uses: Pablommr/kubernetes-eks@v1.1.0
+        uses: Pablommr/kubernetes-eks@v1.2.0
         env:
           KUBE_YAML: kubernetes/configmap.yml
       -
         name: Deployment
-        uses: Pablommr/kubernetes-eks@v1.1.0
+        uses: Pablommr/kubernetes-eks@v1.2.0
         env:
           KUBE_YAML: kubernetes/deployment.yml
           ENVSUBST: true
@@ -151,6 +151,10 @@ jobs:
 <br>
 
 # Change Log
+
+## v1.2.0
+
+- Changed strategy to use an image that has already been built with dependencies in public registry [kubernetes-eks](https://hub.docker.com/r/pablommr/kubernetes-eks), decreasing action execution time
 
 ## v1.1.0
 
