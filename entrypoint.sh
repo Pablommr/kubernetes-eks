@@ -109,7 +109,7 @@ for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY  #Debug
   for files in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
     echo "Files: $files"  #Debug
-    echo -n "$files" >> $GITHUB_STEP_SUMMARY
+    echo -n "$files <br>" >> $GITHUB_STEP_SUMMARY
   done
   echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
 done
