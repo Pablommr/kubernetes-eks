@@ -96,9 +96,9 @@ FILES_JSON='{}'
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
   #MacOS
-  #kind="$(sed -n '/^kind: /{p; q;}' $FILES_PATH/$i | cut -d ':' -f2 | tr -d ' ')"
+  kind="$(sed -n '/^kind: /{p; q;}' $FILES_PATH/$i | cut -d ':' -f2 | tr -d ' ')"
   #Github Actions
-  kind="$(sed -n '/^kind: /{p;q}' $FILES_PATH/$i | cut -d ':' -f2 | tr -d ' ')"
+  #kind="$(sed -n '/^kind: /{p;q}' $FILES_PATH/$i | cut -d ':' -f2 | tr -d ' ')"
   FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$i\"]")"
 done
 
@@ -112,7 +112,7 @@ for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY  #Debug
   for files in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
     echo "Files: $files"  #debug
-    echo "| $Files | " >> $GITHUB_STEP_SUMMARY
+    echo "| $files | " >> $GITHUB_STEP_SUMMARY
   done
   echo "| Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
 done
