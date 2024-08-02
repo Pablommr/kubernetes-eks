@@ -91,6 +91,8 @@ FILES_YAML=($(ls $FILES_PATH))
 
 FILES_JSON='{}'
 
+###Testar quando tiver pasta dentro pa pasta e arquivos não yaml
+
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
   kind="$(sed -n '/^kind: /{p; q;}' $FILES_PATH/$i | cut -d ':' -f2 | tr -d ' ')"
