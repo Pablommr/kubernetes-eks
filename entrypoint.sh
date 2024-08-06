@@ -82,34 +82,70 @@
 #
 #echo "All done! =D"
 
+#Cria Json com arquivos a serem aplicados
+createJsonFiles () {
+  file="$1"
+  local kind="$(sed -n '/^kind: /{p; q;}' $file | cut -d ':' -f2 | tr -d ' ')"
+  FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$file\"]")"
+}
 
-###Tratar e retirar / no final
+###=============
+
+#envs de usuário
 FILES_PATH="kubernetes"
+SUBPATH=false
+
+
+# Verifica se o último caractere é uma barra (/)
+if [[ "$FILES_PATH" == */ ]]; then
+  # Remove a barra (/) do final
+  FILES_PATH=${FILES_PATH%/}
+fi
 
 #Lista de arquivos
-FILES_YAML=($(ls $FILES_PATH))
+FILES_YAML=($(find $FILES_PATH -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 
 FILES_JSON='{}'
 
-###Testar quando tiver pasta dentro pa pasta e arquivos não yaml
+## Criar env de subdiretório
+##Verificar no caso que o arquivo tem ---
 
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
-  kind="$(sed -n '/^kind: /{p; q;}' $FILES_PATH/$i | cut -d ':' -f2 | tr -d ' ')"
-  FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$i\"]")"
+
+  #Remove da string o path informado pelo usuário
+  files_relative=$(echo "$i" | sed "s|$FILES_PATH/||")
+
+  # Conta o número de barras (/) no caminho e subtrai 1 para obter o número de sub-diretórios
+  num_directories=$(echo "$files_relative" | tr -cd '/' | wc -c)
+
+  if $SUBPATH; then
+    #cria Json com todos os arquivos do diretório e sub-diretório
+    createJsonFiles $i
+  else
+    #Verifica se tem mais sub-diretórios além do informado
+    if [ $num_directories -gt 0 ]; then
+      echo "Ignorando arquivo $i"
+    else
+      createJsonFiles $i
+    fi
+  fi
 done
 
-echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
-echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+echo ''
+echo $FILES_JSON
 
-#Percorre JSON para aplicar os arquivos
-for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
-
-  echo "Type: $type"
-  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY  #Debug
-  for files in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
-    echo "Files: $files"  #Debug
-    echo -n "$files <br>" >> $GITHUB_STEP_SUMMARY
-  done
-  echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
-done
+#echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
+#echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+#
+##Percorre JSON para aplicar os arquivos
+#for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
+#
+#  echo "Type: $type"
+#  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY  #Debug
+#  for files in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
+#    echo "Files: $files"  #Debug
+#    echo -n "$files <br>" >> $GITHUB_STEP_SUMMARY
+#  done
+#  echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
+#done
