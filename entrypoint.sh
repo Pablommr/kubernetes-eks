@@ -82,18 +82,43 @@
 #
 #echo "All done! =D"
 
+##TESTAR COM + DE 1 ARQUIVO COM ---
 #Cria Json com arquivos a serem aplicados
 createJsonFiles () {
-  file="$1"
+  local file="$1"
   local kind="$(sed -n '/^kind: /{p; q;}' $file | cut -d ':' -f2 | tr -d ' ')"
-  FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$file\"]")"
+
+  #Folder que será usado para amarzernar os arquivos splitados
+  local folder_split='csplit'
+
+  if [ $(grep "^---$" "$file" | wc -l) -ne 0 ]; then
+    #cria o diretório csplit
+    mkdir -p $folder_split
+    #Não funciona no MacOS
+    csplit --prefix=artifact_ --suffix-format="%02d.yaml" "$file" "/---/" "{*}" > /dev/null 2>&1
+    #Move os novos arquivos criados
+    mv artifact_* $folder_split
+    #Remove o arquivo com ---
+  #  rm $file
+
+    #Lista dos novos arquivos
+    local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+
+    #Percorre os novos arquivos
+    for j in ${NEW_FILES_YAML[@]}; do
+      createJsonFiles $j
+    done
+
+  else
+    FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$file\"]")"
+  fi
 }
 
 ###=============
 
 #envs de usuário
 FILES_PATH="kubernetes"
-SUBPATH=false
+SUBPATH=true
 
 
 # Verifica se o último caractere é uma barra (/)
@@ -133,7 +158,7 @@ for i in ${FILES_YAML[@]}; do
 done
 
 echo ''
-echo $FILES_JSON
+echo $FILES_JSON |jq
 
 #echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
 #echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
