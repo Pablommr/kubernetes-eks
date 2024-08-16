@@ -96,7 +96,7 @@ createJsonFiles () {
     local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 
     echo "echo NEW_FILES_YAML"
-    echo $NEW_FILES_YAML
+    echo ${NEW_FILES_YAML[@]}
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
@@ -106,6 +106,7 @@ createJsonFiles () {
   else
     FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$file\"]")"
   fi
+  echo "-----------------------------"
 }
 
 envSubstitution () {
