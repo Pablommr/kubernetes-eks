@@ -90,8 +90,6 @@ createJsonFiles () {
     #Remove o arquivo com ---
     rm $file
 
-    ls csplit/*
-
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 
