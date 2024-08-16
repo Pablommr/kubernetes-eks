@@ -28,8 +28,8 @@
 #else
 #  echo 'Envs filled!'
 #fi
-
-echo ""
+#
+#echo ""
 
 mkdir -p ~/.aws
 mkdir -p ~/.kube
@@ -125,20 +125,23 @@ applyFile () {
 ###=============
 
 #envs de usuário
-FILES_PATH="kubernetes"
+FILES_PATH=("kubernetes")
 SUBPATH=true
 KUBE_YAML=()
 
 
+# Loop para iterar sobre cada item no vetor
+for i in "${!FILES_PATH[@]}"; do
+  if [[ "${FILES_PATH[$i]}" == */ ]]; then
+    # Remove a barra (/) do final
+    FILES_PATH[$i]="${FILES_PATH[$i]%/}"
+  fi
+done
 
-# Verifica se o último caractere é uma barra (/)
-if [[ "$FILES_PATH" == */ ]]; then
-  # Remove a barra (/) do final
-  FILES_PATH=${FILES_PATH%/}
-fi
-
-#Lista de arquivos
-FILES_YAML=($(find $FILES_PATH -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+for j in "${!FILES_PATH[@]}"; do
+  #Lista de arquivos
+  FILES_YAML+=($(find ${FILES_PATH[$j]} -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+done
 
 FILES_JSON='{}'
 
