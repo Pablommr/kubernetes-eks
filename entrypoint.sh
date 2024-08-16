@@ -84,7 +84,7 @@ createJsonFiles () {
     #cria o diretório csplit
     mkdir -p $folder_split
     #Não funciona no MacOS
-    csplit "$(date +%s%N | cut -b1-9)_artifact_" --suffix-format="%02d.yaml" "$file" "/---/" "{*}" > /dev/null 2>&1
+    csplit "$(uuidgen | cut -c1-4)_artifact_" --suffix-format="%02d.yaml" "$file" "/---/" "{*}" > /dev/null 2>&1
     #Move os novos arquivos criados
     mv *_artifact_* $folder_split
     #Remove o arquivo com ---
