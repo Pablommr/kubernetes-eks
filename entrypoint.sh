@@ -47,22 +47,7 @@
 ##Unset var to make sure ther are no conflict
 #unset KUBECONFIG
 #
-##Alter files if ENVSUBS=true
-#if [ "$ENVSUBST" = true ]; then
 #
-#  for ENV_VAR in $(env |cut -f 1 -d =); do
-#    VAR_KEY=$ENV_VAR
-#    VAR_VALUE=$(eval echo \$$ENV_VAR | sed -e 's/\//\\&/g;s/\&/\\&/g;')
-#    sed -i "s/\$$VAR_KEY/$VAR_VALUE/g" $KUBE_YAML
-#  done
-#
-#fi
-#
-#echo "Applying file:"
-#
-##Applying artifact
-#KUBE_APPLY=$(kubectl apply -f $KUBE_YAML)
-#echo $KUBE_APPLY
 #
 ##Verify and execute rollout
 #if [ "$KUBE_ROLLOUT" == true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
@@ -82,7 +67,6 @@
 #
 #echo "All done! =D"
 
-##TESTAR COM + DE 1 ARQUIVO COM ---
 #Cria Json com arquivos a serem aplicados
 createJsonFiles () {
   local file="$1"
@@ -99,7 +83,7 @@ createJsonFiles () {
     #Move os novos arquivos criados
     mv artifact_* $folder_split
     #Remove o arquivo com ---
-  #  rm $file
+    rm $file
 
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
@@ -114,11 +98,32 @@ createJsonFiles () {
   fi
 }
 
+envSubstitution () {
+  local file="$1"
+
+  for ENV_VAR in $(env |cut -f 1 -d =); do
+    local VAR_KEY=$ENV_VAR
+    local VAR_VALUE=$(eval echo \$$ENV_VAR | sed -e 's/\//\\&/g;s/\&/\\&/g;')
+    sed -i "s/\$$VAR_KEY/$VAR_VALUE/g" $file
+  done
+}
+
+applyFile () {
+  local file="$1"
+
+  #Applying artifact
+  echo "Applying file: $file"
+  KUBE_APPLY=$(kubectl apply -f $file)
+  echo $KUBE_APPLY
+}
+
 ###=============
 
 #envs de usuário
 FILES_PATH="kubernetes"
 SUBPATH=true
+KUBE_YAML=()
+
 
 
 # Verifica se o último caractere é uma barra (/)
@@ -131,6 +136,9 @@ fi
 FILES_YAML=($(find $FILES_PATH -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 
 FILES_JSON='{}'
+
+#Adiciona arquivos individuais setados pelo usuário
+FILES_YAML+=("${KUBE_YAML[@]}")
 
 ## Criar env de subdiretório
 ##Verificar no caso que o arquivo tem ---
@@ -157,20 +165,26 @@ for i in ${FILES_YAML[@]}; do
   fi
 done
 
-echo ''
-echo $FILES_JSON |jq
 
-#echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
-#echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
-#
-##Percorre JSON para aplicar os arquivos
-#for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
-#
-#  echo "Type: $type"
-#  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY  #Debug
-#  for files in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
-#    echo "Files: $files"  #Debug
-#    echo -n "$files <br>" >> $GITHUB_STEP_SUMMARY
-#  done
-#  echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
-#done
+echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
+echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+
+#Percorre JSON para aplicar os arquivos
+for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
+
+  echo "Type: $type"
+  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY  #Debug
+  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
+    echo "File: $file"  #Debug
+    echo -n "$file <br>" >> $GITHUB_STEP_SUMMARY
+
+    #Alter files if ENVSUBS=true
+    if [ "$ENVSUBST" = true ]; then
+      envSubstitution $file
+    fi
+
+    #Apply file
+    applyFile $file
+  done
+  echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
+done
