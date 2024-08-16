@@ -28,24 +28,24 @@
 #else
 #  echo 'Envs filled!'
 #fi
-#
-#echo ""
-#
-#mkdir -p ~/.aws
-#mkdir -p ~/.kube
-#
-#AWS_CREDENTIALS_PATH='~/.aws/credentials'
-#KUBECONFIG_PATH='~/.kube/config'
-#
-##fulfiling the files
-#echo "[$AWS_PROFILE_NAME]" > $(eval echo $AWS_CREDENTIALS_PATH)
-#echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $(eval echo $AWS_CREDENTIALS_PATH)
-#echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $(eval echo $AWS_CREDENTIALS_PATH)
-#
-#echo "$KUBECONFIG" |base64 -d > $(eval echo $KUBECONFIG_PATH)
-#
-##Unset var to make sure ther are no conflict
-#unset KUBECONFIG
+
+echo ""
+
+mkdir -p ~/.aws
+mkdir -p ~/.kube
+
+AWS_CREDENTIALS_PATH='~/.aws/credentials'
+KUBECONFIG_PATH='~/.kube/config'
+
+#fulfiling the files
+echo "[$AWS_PROFILE_NAME]" > $(eval echo $AWS_CREDENTIALS_PATH)
+echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $(eval echo $AWS_CREDENTIALS_PATH)
+echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $(eval echo $AWS_CREDENTIALS_PATH)
+
+echo "$KUBECONFIG" |base64 -d > $(eval echo $KUBECONFIG_PATH)
+
+#Unset var to make sure ther are no conflict
+unset KUBECONFIG
 #
 #
 #
@@ -84,6 +84,10 @@ createJsonFiles () {
     mv artifact_* $folder_split
     #Remove o arquivo com ---
     rm $file
+
+    echo "Aki csplit"
+    ls
+    ls $folder_split
 
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
