@@ -87,6 +87,7 @@ createJsonFiles () {
 
     echo "Aki csplit"
     echo "file: $file"
+    cat $file
     echo "ls kubernetes"
     ls kubernetes/
     echo ""
