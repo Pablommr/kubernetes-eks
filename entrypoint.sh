@@ -86,11 +86,17 @@ createJsonFiles () {
     rm $file
 
     echo "Aki csplit"
-    ls
+    echo "ls kubernetes"
+    ls kubernetes/
+    echo ""
+    echo "ls $folder_split"
     ls $folder_split
 
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+
+    echo "echo NEW_FILES_YAML"
+    echo $NEW_FILES_YAML
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
