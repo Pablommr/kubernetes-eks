@@ -75,6 +75,11 @@ createJsonFiles () {
   #Folder que será usado para amarzernar os arquivos splitados
   local folder_split='csplit'
 
+  #Verifica se tem '---' na primeira linha, e caso tenha, remove
+  if [ "$(head -1 $file)" == "---" ]; then
+    sed -i '1d' $file
+  fi
+
   if [ $(grep "^---$" "$file" | wc -l) -ne 0 ]; then
     #cria o diretório csplit
     mkdir -p $folder_split
