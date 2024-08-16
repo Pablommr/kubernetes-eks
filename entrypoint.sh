@@ -86,7 +86,7 @@ createJsonFiles () {
     #Não funciona no MacOS
     csplit "$(shuf -i 100-999 -n 1)_artifact_" --suffix-format="%02d.yaml" "$file" "/---/" "{*}" > /dev/null 2>&1
     #Move os novos arquivos criados
-    mv artifact_* $folder_split
+    mv *_artifact_* $folder_split
     #Remove o arquivo com ---
     rm $file
 
