@@ -88,16 +88,7 @@ createJsonFiles () {
     #Move os novos arquivos criados
     mv artifact_* $folder_split
     #Remove o arquivo com ---
-    cat $file
     rm $file
-
-    echo "Aki csplit"
-    echo "file: $file"
-    echo "ls kubernetes"
-    ls kubernetes/
-    echo ""
-    echo "ls $folder_split"
-    ls $folder_split
 
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
@@ -113,7 +104,6 @@ createJsonFiles () {
   else
     FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$file\"]")"
   fi
-  echo "-----------------------------"
 }
 
 envSubstitution () {
@@ -157,9 +147,6 @@ FILES_JSON='{}'
 
 #Adiciona arquivos individuais setados pelo usuário
 FILES_YAML+=("${KUBE_YAML[@]}")
-
-## Criar env de subdiretório
-##Verificar no caso que o arquivo tem ---
 
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
