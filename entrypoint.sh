@@ -83,11 +83,11 @@ createJsonFiles () {
     #Move os novos arquivos criados
     mv artifact_* $folder_split
     #Remove o arquivo com ---
+    cat $file
     rm $file
 
     echo "Aki csplit"
     echo "file: $file"
-    cat $file
     echo "ls kubernetes"
     ls kubernetes/
     echo ""
