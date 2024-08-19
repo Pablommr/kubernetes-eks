@@ -119,26 +119,34 @@ artifactType () {
   echo "Type: $type"
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
 
+  local tmp_count="0"
   for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
-    echo "File: $file"
-    echo -n "$file <br>" >> $GITHUB_STEP_SUMMARY
-
     #Alter files if ENVSUBS=true
     if [ "$ENVSUBST" = true ]; then
       envSubstitution $file
     fi
 
     #Apply file
-    applyFile $file
+    applyFile $file $tmp_count
+
+    #Incrementa o Count
+    ((tmp_count++))
   done
 
 }
 
 applyFile () {
   local file="$1"
+  local tmp_count="$2"
+
+  #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
+  if [ "$tmp_count" -gt 0 ]; then
+    echo -n "| | " >> $GITHUB_STEP_SUMMARY
+  fi
 
   #Applying artifact
   echo "Applying file: $file"
+  echo -n "$file" >> $GITHUB_STEP_SUMMARY
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   if [ $? -ne 0 ]; then
     echo "Erro ao aplicar o arquivo $file:"
