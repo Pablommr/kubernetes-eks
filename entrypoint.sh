@@ -120,7 +120,7 @@ artifactType () {
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
 
   for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
-    echo "File: $file"  #Debug
+    echo "File: $file"
     echo -n "$file <br>" >> $GITHUB_STEP_SUMMARY
 
     #Alter files if ENVSUBS=true
@@ -139,10 +139,14 @@ applyFile () {
 
   #Applying artifact
   echo "Applying file: $file"
-  KUBE_APPLY=$(kubectl apply -f $file)
+  KUBE_APPLY=$(kubectl apply -f $file 2>&1)
+  if [ $? -ne 0 ]; then
+    echo "Erro ao aplicar o arquivo $file:"
+  else
+    echo "Arquivo aplicado com sucesso:"
+    echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
+  fi
   echo $KUBE_APPLY
-  #FAZER IF EM CASO DE ERRO
-  echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
 }
 
 ###=============
