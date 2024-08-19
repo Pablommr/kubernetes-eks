@@ -192,7 +192,7 @@ done
 echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
 echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
 
-Verifica se tem artefatos do tipo Namespace para aplicar primeiro
+#Verifica se tem artefatos do tipo Namespace para aplicar primeiro
 if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
   echo "Type: Namespace"
   echo -n "| Namespace | " >> $GITHUB_STEP_SUMMARY
