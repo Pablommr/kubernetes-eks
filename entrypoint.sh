@@ -86,12 +86,15 @@ createJsonFiles () {
     #Não funciona no MacOS
     csplit --prefix="$(uuidgen | cut -c1-4)_artifact_" --suffix-format="%02d.yaml" "$file" "/---/" "{*}" > /dev/null 2>&1
     #Move os novos arquivos criados
-    mv *_artifact_* $folder_split
+    cp *_artifact_* $folder_split
     #Remove o arquivo com ---
     rm $file
 
     #Lista dos novos arquivos
-    local NEW_FILES_YAML=($(find $folder_split -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+    local NEW_FILES_YAML=($(find . -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+
+    #Remove arquivos locais para não haver repetição na próxima iteração
+    rm -rfv *_artifact_*
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
