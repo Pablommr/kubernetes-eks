@@ -152,7 +152,7 @@ applyFile () {
     echo "Erro ao aplicar o arquivo $file:"
     echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
   else
-    echo "Arquivo aplicado com sucesso:"
+    echo "Arquivo aplicado com sucesso: $file"
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
   fi
   echo $KUBE_APPLY
@@ -185,10 +185,6 @@ FILES_JSON='{}'
 #Adiciona arquivos individuais setados pelo usuário
 FILES_YAML+=("${KUBE_YAML[@]}")
 
-echo "Files to apply:"
-echo $FILES_YAML | jq
-echo "============================="
-
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
 
@@ -214,6 +210,10 @@ done
 
 echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
 echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+
+echo "Files to apply:"
+echo $FILES_YAML | jq
+echo "============================="
 
 #Verifica se tem artefatos do tipo Namespace para aplicar primeiro
 if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
