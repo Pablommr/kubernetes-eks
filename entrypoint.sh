@@ -74,6 +74,7 @@ createJsonFiles () {
 
   #Folder que será usado para amarzernar os arquivos splitados
   local folder_split='csplit'
+  local tmp_dir='tmp_dir'
 
   #Verifica se tem '---' na primeira linha, e caso tenha, remove
   if [ "$(head -1 $file)" == "---" ]; then
@@ -83,22 +84,25 @@ createJsonFiles () {
   if [ $(grep "^---$" "$file" | wc -l) -ne 0 ]; then
     #cria o diretório csplit
     mkdir -p $folder_split
+    mkdir -p $tmp_dir
     #Não funciona no MacOS
     csplit --prefix="$(uuidgen | cut -c1-4)_artifact_" --suffix-format="%02d.yaml" "$file" "/---/" "{*}" > /dev/null 2>&1
     #Move os novos arquivos criados
     cp *_artifact_* $folder_split
+    cp *_artifact_* $tmp_dir
     #Remove o arquivo com ---
     rm $file
 
+    ###ARRUMAR AKI
     #Lista dos novos arquivos
-    local NEW_FILES_YAML=($(find . -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+    local NEW_FILES_YAML=($(find $tmp_dir -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 
     #Remove arquivos locais para não haver repetição na próxima iteração
-    rm -rfv *_artifact_*
+    rm -rfv $tmp_dir
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
-      createJsonFiles "$folder_split/$j"
+      createJsonFiles "$(echo "$j" | sed 's/tmp_dir/csplit/')"
     done
 
   else
