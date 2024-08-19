@@ -156,6 +156,7 @@ applyFile () {
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
   fi
   echo $KUBE_APPLY
+  echo "============================="
 }
 
 ###=============
@@ -183,6 +184,10 @@ FILES_JSON='{}'
 
 #Adiciona arquivos individuais setados pelo usuário
 FILES_YAML+=("${KUBE_YAML[@]}")
+
+echo "Files to apply:"
+echo $FILES_YAML | jq
+echo "============================="
 
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
