@@ -116,6 +116,9 @@ envSubstitution () {
 artifactType () {
   local type="$1"
 
+  echo "Type: $type"
+  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
+
   for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
     echo "File: $file"  #Debug
     echo -n "$file <br>" >> $GITHUB_STEP_SUMMARY
@@ -138,6 +141,8 @@ applyFile () {
   echo "Applying file: $file"
   KUBE_APPLY=$(kubectl apply -f $file)
   echo $KUBE_APPLY
+  #FAZER IF EM CASO DE ERRO
+  echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
 }
 
 ###=============
@@ -194,8 +199,6 @@ echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
 
 #Verifica se tem artefatos do tipo Namespace para aplicar primeiro
 if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
-  echo "Type: Namespace"
-  echo -n "| Namespace | " >> $GITHUB_STEP_SUMMARY
   artifactType "Namespace"
 fi
 
@@ -207,8 +210,6 @@ for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
      [[ "$type" != "ReplicaSet" ]] && \
      [[ "$type" != "DaemonSet" ]] && \
      [[ "$type" != "Pod" ]]; then
-    echo "Type: $type"
-    echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
     artifactType $type
   fi
 done
@@ -222,9 +223,5 @@ last_apply=(
 )
 
 for type in $last_apply; do
-  echo "Type: $type"
-  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
   artifactType $type
 done
-
-echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
