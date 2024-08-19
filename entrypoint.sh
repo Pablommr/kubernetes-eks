@@ -98,7 +98,7 @@ createJsonFiles () {
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
-      createJsonFiles $j
+      createJsonFiles "$folder_split/$j"
     done
 
   else
