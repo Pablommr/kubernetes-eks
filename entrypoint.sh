@@ -212,7 +212,7 @@ echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
 echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
 
 echo "Files to apply:"
-echo $FILES_YAML | jq
+echo $FILES_JSON | jq
 echo "============================="
 
 #Verifica se tem artefatos do tipo Namespace para aplicar primeiro
