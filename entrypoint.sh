@@ -113,6 +113,24 @@ envSubstitution () {
   done
 }
 
+artifactType () {
+  local type="$1"
+
+  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
+    echo "File: $file"  #Debug
+    echo -n "$file <br>" >> $GITHUB_STEP_SUMMARY
+
+    #Alter files if ENVSUBS=true
+    if [ "$ENVSUBST" = true ]; then
+      envSubstitution $file
+    fi
+
+    #Apply file
+    applyFile $file
+  done
+
+}
+
 applyFile () {
   local file="$1"
 
@@ -174,22 +192,39 @@ done
 echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
 echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
 
-#Percorre JSON para aplicar os arquivos
+Verifica se tem artefatos do tipo Namespace para aplicar primeiro
+if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
+  echo "Type: Namespace"
+  echo -n "| Namespace | " >> $GITHUB_STEP_SUMMARY
+  artifactType "Namespace"
+fi
+
+#Percorre todos os tipos de artefatos
 for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
-
-  echo "Type: $type"
-  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY  #Debug
-  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
-    echo "File: $file"  #Debug
-    echo -n "$file <br>" >> $GITHUB_STEP_SUMMARY
-
-    #Alter files if ENVSUBS=true
-    if [ "$ENVSUBST" = true ]; then
-      envSubstitution $file
-    fi
-
-    #Apply file
-    applyFile $file
-  done
-  echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
+  #Verifica se o type não é o tipo Namespace, que já foi aplicado, e se não são artefatos que contém pod para aplicar por último
+  if [[ "$type" != "Namespace" ]] && \
+     [[ "$type" != "Deployment" ]] && \
+     [[ "$type" != "ReplicaSet" ]] && \
+     [[ "$type" != "DaemonSet" ]] && \
+     [[ "$type" != "Pod" ]]; then
+    echo "Type: $type"
+    echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
+    artifactType $type
+  fi
 done
+
+#Aplica os últimos artefatos que tem Pods
+last_apply=(
+  "Deployment"
+  "ReplicaSet"
+  "DaemonSet"
+  "Pod"
+)
+
+for type in $last_apply; do
+  echo "Type: $type"
+  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
+  artifactType $type
+done
+
+echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
