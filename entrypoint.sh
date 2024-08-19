@@ -142,6 +142,7 @@ applyFile () {
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   if [ $? -ne 0 ]; then
     echo "Erro ao aplicar o arquivo $file:"
+    echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
   else
     echo "Arquivo aplicado com sucesso:"
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
