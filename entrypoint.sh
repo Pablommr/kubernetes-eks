@@ -89,9 +89,12 @@ createJsonFiles () {
     csplit --prefix="$(uuidgen | cut -c1-4)_artifact_" --suffix-format="%02d.yaml" "$file" "/---/" "{*}" > /dev/null 2>&1
     #Move os novos arquivos criados
     cp *_artifact_* $folder_split
+    #Esse tmp existe para o find procurar em um lugar único, se não, ele sempre lista tudo do diretório atual
     cp *_artifact_* $tmp_dir
     #Remove o arquivo com ---
     rm $file
+    #Remove arquivos que já foram copiados para não dar duplicidade
+    rm -rfv *_artifact_*
 
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $tmp_dir -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
