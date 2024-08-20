@@ -137,9 +137,8 @@ artifactType () {
 
     #Apply file
     applyFile $file $tmp_count
-    exit
     #Incrementa o Count
-    ((tmp_count++))
+    #((tmp_count++))
   done
 
 }
