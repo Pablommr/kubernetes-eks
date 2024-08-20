@@ -148,7 +148,7 @@ applyFile () {
   local tmp_count="$2"
 
   #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
-  if [ "$tmp_count" -gt 0 ]; then
+  if [ $tmp_count -gt 0 ]; then
     echo -n "| | " >> $GITHUB_STEP_SUMMARY
   fi
 
