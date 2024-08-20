@@ -136,7 +136,7 @@ artifactType () {
     fi
 
     #Apply file
-    #applyFile $file $tmp_count
+    applyFile $file $tmp_count
 
     #Incrementa o Count
     ((tmp_count++))
@@ -229,6 +229,8 @@ echo "============================="
 if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
   artifactType "Namespace"
 fi
+
+exit
 
 #Percorre todos os tipos de artefatos
 for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
