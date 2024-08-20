@@ -122,26 +122,26 @@ envSubstitution () {
   done
 }
 
-artifactType () {
-  local type="$1"
-
-  echo "Type: $type"
-  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
-
-  tmp_count=0
-  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
-    #Alter files if ENVSUBS=true
-    if [ "$ENVSUBST" = true ]; then
-      envSubstitution $file
-    fi
-
-    #Apply file
-    applyFile $file $tmp_count
-    #Incrementa o Count
-    let tmp_count++
-  done
-
-}
+#artifactType () {
+#  local type="$1"
+#
+#  echo "Type: $type"
+#  echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
+#
+#  tmp_count=0
+#  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
+#    #Alter files if ENVSUBS=true
+#    if [ "$ENVSUBST" = true ]; then
+#      envSubstitution $file
+#    fi
+#
+#    #Apply file
+#    applyFile $file $tmp_count
+#    #Incrementa o Count
+#    let tmp_count++
+#  done
+#
+#}
 
 applyFile () {
   local file="$1"
