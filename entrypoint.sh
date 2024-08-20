@@ -157,14 +157,15 @@ applyFile () {
   echo "Applying file: $file"
   echo -n "$file" >> $GITHUB_STEP_SUMMARY
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
-  if [ $? -ne 0 ]; then
+  KUBE_EXIT_CODE=$?
+  if [ $KUBE_EXIT_CODE -ne 0 ]; then
     echo "Erro ao aplicar o arquivo $file:"
     echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
   else
     echo "Arquivo aplicado com sucesso: $file"
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
   fi
-  echo $KUBE_APPLY
+  echo "$KUBE_APPLY"
   echo "============================="
 }
 
