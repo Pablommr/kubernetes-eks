@@ -128,7 +128,7 @@ artifactType () {
   echo "Type: $type"
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
 
-  local tmp_count=0
+  tmp_count=0
   for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
     #Alter files if ENVSUBS=true
     if [ "$ENVSUBST" = true ]; then
@@ -138,7 +138,7 @@ artifactType () {
     #Apply file
     applyFile $file $tmp_count
     #Incrementa o Count
-    let tmp_count++
+    ((tmp_count++))
   done
 
 }
