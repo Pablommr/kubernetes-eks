@@ -94,21 +94,16 @@ createJsonFiles () {
     #Remove o arquivo com ---
     rm $file
     #Remove arquivos que já foram copiados para não dar duplicidade
-    rm -rfv *_artifact_*
+    rm -rf *_artifact_*
 
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $tmp_dir -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 
-    echo "NEW_FILES_YAML: ${NEW_FILES_YAML[@]}"
-    echo "ls tmp_dir: "
-    ls $tmp_dir
-
     #Remove arquivos locais para não haver repetição na próxima iteração
-    rm -rfv $tmp_dir
+    rm -rf $tmp_dir
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
-      echo "j: $j"
       createJsonFiles "$(echo -n $j | sed 's/tmp_dir/csplit/')"
     done
 
