@@ -122,7 +122,7 @@ envSubstitution () {
   done
 }
 
-#artifactType () {
+artifactType () {
 #  local type="$1"
 #
 #  echo "Type: $type"
@@ -141,7 +141,8 @@ envSubstitution () {
 #    let tmp_count++
 #  done
 #
-#}
+  echo "aki"
+}
 
 applyFile () {
   local file="$1"
