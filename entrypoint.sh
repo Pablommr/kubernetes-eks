@@ -138,7 +138,7 @@ artifactType () {
     #Apply file
     applyFile $file $tmp_count
     #Incrementa o Count
-    ((tmp_count++))
+    #((tmp_count++))
   done
 
 }
@@ -148,9 +148,9 @@ applyFile () {
   local tmp_count="$2"
 
   #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
-  #if [ $tmp_count -gt 0 ]; then
-  #  echo -n "| | " >> $GITHUB_STEP_SUMMARY
-  #fi
+  if [ $tmp_count -gt 0 ]; then
+    echo -n "| | " >> $GITHUB_STEP_SUMMARY
+  fi
 
   #Applying artifact
   echo "Applying file: $file"
@@ -229,8 +229,6 @@ echo "============================="
 if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
   artifactType "Namespace"
 fi
-
-exit
 
 #Percorre todos os tipos de artefatos
 for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
