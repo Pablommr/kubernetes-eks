@@ -225,12 +225,12 @@ echo "Files to apply:"
 echo $FILES_JSON | jq
 echo "============================="
 
+exit
+
 #Verifica se tem artefatos do tipo Namespace para aplicar primeiro
 if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
   artifactType "Namespace"
 fi
-
-exit
 
 #Percorre todos os tipos de artefatos
 for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
