@@ -144,30 +144,30 @@ artifactType () {
 
 }
 
-applyFile () {
-  local file="$1"
-  local tmp_count="$2"
-
-  #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
-  if [ "$tmp_count" -gt 0 ]; then
-    echo -n "| | " >> $GITHUB_STEP_SUMMARY
-  fi
-
-  #Applying artifact
-  echo "Applying file: $file"
-  echo -n "$file" >> $GITHUB_STEP_SUMMARY
-  KUBE_APPLY=$(kubectl apply -f $file 2>&1)
-  KUBE_EXIT_CODE=$?
-  if [ $KUBE_EXIT_CODE -ne 0 ]; then
-    echo "Erro ao aplicar o arquivo $file:"
-    echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
-  else
-    echo "Arquivo aplicado com sucesso: $file"
-    echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
-  fi
-  echo "$KUBE_APPLY"
-  echo "============================="
-}
+#applyFile () {
+#  local file="$1"
+#  local tmp_count="$2"
+#
+#  #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
+#  if [ "$tmp_count" -gt 0 ]; then
+#    echo -n "| | " >> $GITHUB_STEP_SUMMARY
+#  fi
+#
+#  #Applying artifact
+#  echo "Applying file: $file"
+#  echo -n "$file" >> $GITHUB_STEP_SUMMARY
+#  KUBE_APPLY=$(kubectl apply -f $file 2>&1)
+#  KUBE_EXIT_CODE=$?
+#  if [ $KUBE_EXIT_CODE -ne 0 ]; then
+#    echo "Erro ao aplicar o arquivo $file:"
+#    echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
+#  else
+#    echo "Arquivo aplicado com sucesso: $file"
+#    echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
+#  fi
+#  echo "$KUBE_APPLY"
+#  echo "============================="
+#}
 
 ###=============
 
