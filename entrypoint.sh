@@ -93,7 +93,6 @@ createJsonFiles () {
     #Remove o arquivo com ---
     rm $file
 
-    ###ARRUMAR AKI
     #Lista dos novos arquivos
     local NEW_FILES_YAML=($(find $tmp_dir -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 
@@ -102,7 +101,8 @@ createJsonFiles () {
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
-      createJsonFiles "$(echo "$j" | sed 's/tmp_dir/csplit/')"
+      echo "j: $j"
+      createJsonFiles "$(echo -n $j | sed 's/tmp_dir/csplit/')"
     done
 
   else
