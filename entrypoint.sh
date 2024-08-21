@@ -2,34 +2,46 @@
 
 #set -e
 #
-#echo "Checking ENVs..."
-#
-##Check if ENVs is fulfiled
-#if [ -z "$AWS_ACCESS_KEY_ID" ]
-#then
-#  echo 'Env AWS_ACCESS_KEY_ID is empty! Please, fulfil it with your aws access key...'
-#  exit 1
-#elif [ -z "$AWS_SECRET_ACCESS_KEY" ]
-#then
-#  echo 'Env AWS_SECRET_ACCESS_KEY is empty! Please, fulfil  with your aws access secret...'
-#  exit 1
-#elif [ -z "$KUBECONFIG" ]
-#then
-#  echo 'Env KUBECONFIG is empty! Please, fulfil it with your kubeconfig in base64...'
-#  exit 1
-#elif [ ! -e "$(eval echo $KUBE_YAML)" ]
-#then
-#  echo "Env KUBE_YAML is empty or file doesn't exist! Please, fulfil it with full path where your file is..."
-#  exit 1
-#elif [ -z "$AWS_PROFILE_NAME" ]
-#then
-#  AWS_PROFILE_NAME='default'
-#  echo 'Env AWS_PROFILE_NAME is empty! Using default.'
-#else
-#  echo 'Envs filled!'
-#fi
-#
-#echo ""
+echo "Checking ENVs..."
+
+#Check if ENVs is fulfiled
+if [ -z "$AWS_ACCESS_KEY_ID" ]
+then
+  echo 'Env AWS_ACCESS_KEY_ID is empty! Please, fulfil it with your aws access key...'
+  exit 1
+elif [ -z "$AWS_SECRET_ACCESS_KEY" ]
+then
+  echo 'Env AWS_SECRET_ACCESS_KEY is empty! Please, fulfil  with your aws access secret...'
+  exit 1
+elif [ -z "$KUBECONFIG" ]
+then
+  echo 'Env KUBECONFIG is empty! Please, fulfil it with your kubeconfig in base64...'
+  exit 1
+elif [ -z "$AWS_PROFILE_NAME" ]
+then
+  AWS_PROFILE_NAME='default'
+  echo 'Env AWS_PROFILE_NAME is empty! Using default.'
+elif [ -n "$FILES_PATH" ] || [ -n "$KUBE_YAML" ]
+then
+  echo "Envs KUBE_YAML or FILES_PATH is empty or file doesn't exist! Please, fulfil it with full path where your file is..."
+  exit 1
+elif [ -z "$SUBPATH" ] || [ "$SUBPATH" = "true" ] || [ "$SUBPATH" = "false" ]
+then
+  SUBPATH=false
+  echo 'Env SUBPATH is empty! Using default=false.'
+elif [ -z "$CONTINUE_IF_FAIL" ] || [ "$CONTINUE_IF_FAIL" = "true" ] || [ "$CONTINUE_IF_FAIL" = "false" ]
+then
+  CONTINUE_IF_FAIL=false
+  echo 'Env CONTINUE_IF_FAIL is empty! Using default=false.'
+elif [ -z "$KUBE_ROLLOUT" ] || [ "$KUBE_ROLLOUT" = "true" ] || [ "$KUBE_ROLLOUT" = "false" ]
+then
+  KUBE_ROLLOUT=true
+  echo 'Env KUBE_ROLLOUT is empty! Using default=true.'
+else
+  echo 'Envs filled!'
+fi
+
+echo ""
 
 mkdir -p ~/.aws
 mkdir -p ~/.kube
@@ -46,26 +58,6 @@ echo "$KUBECONFIG" |base64 -d > $(eval echo $KUBECONFIG_PATH)
 
 #Unset var to make sure ther are no conflict
 unset KUBECONFIG
-#
-#
-#
-##Verify and execute rollout
-#if [ "$KUBE_ROLLOUT" == true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
-#  echo ""
-#  echo "Applying rollout:"
-#  kubectl rollout restart --filename $KUBE_YAML
-#  echo ""
-#  echo "Checking rollout status:"
-#  kubectl rollout status --filename $KUBE_YAML
-#elif [ "$KUBE_ROLLOUT" = true ] && ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
-#  echo ""
-#  echo "Checking rollout status:"
-#  kubectl rollout status --filename $KUBE_YAML
-#fi
-#
-#echo ""
-#
-#echo "All done! =D"
 
 #Cria Json com arquivos a serem aplicados
 createJsonFiles () {
@@ -133,6 +125,7 @@ envSubstitution () {
 
 artifactType () {
   local type="$1"
+  local kube_rollout="$2"
 
   echo "Type: $type"
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
@@ -149,7 +142,7 @@ artifactType () {
     fi
 
     #Apply file
-    applyFile $file $print_name $tmp_count
+    applyFile $file $print_name $tmp_count $kube_rollout
     #Incrementa o Count
     tmp_count=$((tmp_count + 1))
   done
@@ -159,6 +152,7 @@ applyFile () {
   local file="$1"
   local print_name="$2"
   local tmp_count="$3"
+  local kube_rollout="$4"
 
   #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
   if [ $tmp_count -gt 0 ]; then
@@ -183,18 +177,26 @@ applyFile () {
     echo "Arquivo aplicado com sucesso: $file"
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
   fi
+
+  #Verify and execute rollout
+  if [ "$kube_rollout" == true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
+    echo ""
+    echo "Applying rollout:"
+    kubectl rollout restart --filename $KUBE_YAML
+    echo ""
+    echo "Checking rollout status:"
+    kubectl rollout status --filename $KUBE_YAML
+  elif [ "$kube_rollout" = true ] && ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
+    echo ""
+    echo "Checking rollout status:"
+    kubectl rollout status --filename $KUBE_YAML
+  fi
+
   echo "$KUBE_APPLY"
   echo "============================="
 }
 
 ###=============
-
-#envs de usuário
-FILES_PATH=("kubernetes")
-SUBPATH=true
-CONTINUE_IF_FAIL=true
-KUBE_YAML=()
-
 
 # Loop para iterar sobre cada item no vetor
 for i in "${!FILES_PATH[@]}"; do
@@ -247,7 +249,7 @@ echo "============================="
 
 #Verifica se tem artefatos do tipo Namespace para aplicar primeiro
 if echo -n "$FILES_JSON" | jq -e '.Namespace' > /dev/null; then
-  artifactType "Namespace"
+  artifactType "Namespace" false
 fi
 
 #Percorre todos os tipos de artefatos
@@ -258,7 +260,7 @@ for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
      [[ "$type" != "ReplicaSet" ]] && \
      [[ "$type" != "DaemonSet" ]] && \
      [[ "$type" != "Pod" ]]; then
-    artifactType $type
+    artifactType $type false
   fi
 done
 
@@ -271,5 +273,13 @@ last_apply=(
 )
 
 for type in $last_apply; do
-  artifactType $type
+  if [ "$KUBE_ROLLOUT" = true ]; then
+    artifactType $type true
+  else
+    artifactType $type false
+  fi
 done
+
+
+echo ""
+echo "All done! =D"
