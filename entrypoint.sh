@@ -190,7 +190,7 @@ applyFile () {
 
 #envs de usuário
 FILES_PATH=("kubernetes")
-SUBPATH=false
+SUBPATH=true
 CONTINUE_IF_FAIL=true
 KUBE_YAML=()
 
