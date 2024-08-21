@@ -109,7 +109,7 @@ createJsonFiles () {
     done
 
   else
-    FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += {"file":\"$file\"} | (.$kind | .files) += {"print":\"$name_file\"}")"
+    FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += [{"file":\"$file\"},{"print":\"$name_file\"}]")"
   fi
 }
 
