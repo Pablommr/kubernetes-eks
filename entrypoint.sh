@@ -108,8 +108,11 @@ createJsonFiles () {
     done
 
   else
-    FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.cliente == \"$kind\") // .$kind | .files) += [\"$file\"]")"
+    FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(select(.$kind | .files) += [\"$file\"]")"
   fi
+
+  echo $FILES_JSON | jq
+  exit
 }
 
 envSubstitution () {
