@@ -69,7 +69,9 @@ unset KUBECONFIG
 
 #Cria Json com arquivos a serem aplicados
 createJsonFiles () {
+  #Local do arquivo a ser aplicado
   local file="$1"
+  #Env que será usada para realizar o print na página do Actions
   local name_file="$2"
   local kind="$(sed -n '/^kind: /{p; q;}' $file | cut -d ':' -f2 | tr -d ' ')"
 
@@ -109,6 +111,14 @@ createJsonFiles () {
     done
 
   else
+    echo $name_file
+    #Verifica se a env que printa está vazia
+    if [ -z "$name_file" ]; then
+      name_file="$file"
+      echo "Cai no if"
+    fi
+    echo $name_file
+
     FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += [{"file":\"$file\","print":\"$name_file\"}]")"
   fi
 }
