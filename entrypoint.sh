@@ -70,6 +70,7 @@ unset KUBECONFIG
 #Cria Json com arquivos a serem aplicados
 createJsonFiles () {
   local file="$1"
+  local name_file="$2"
   local kind="$(sed -n '/^kind: /{p; q;}' $file | cut -d ':' -f2 | tr -d ' ')"
 
   #Folder que será usado para amarzernar os arquivos splitados
@@ -104,11 +105,11 @@ createJsonFiles () {
 
     #Percorre os novos arquivos
     for j in ${NEW_FILES_YAML[@]}; do
-      createJsonFiles "$(echo -n $j | sed 's/tmp_dir/csplit/')"
+      createJsonFiles "$(echo -n $j | sed 's/tmp_dir/csplit/')" $file
     done
 
   else
-    FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += [\"$file\"]")"
+    FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += [\"$file\"] | (.$kind | .file_name) = \"$name_file\"")"
   fi
 }
 
