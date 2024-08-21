@@ -174,6 +174,7 @@ applyFile () {
     echo "Erro ao aplicar o arquivo $file:"
     echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
     #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
+    echo "KUBE_EXIT_CODE: $KUBE_EXIT_CODE"
     if ! $CONTINUE_IF_FAIL; then
       exit 1
     fi
