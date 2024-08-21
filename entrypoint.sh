@@ -109,6 +109,7 @@ createJsonFiles () {
 
   else
     FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += [\"$file\"]")"
+    echo $FILES_JSON | jq
   fi
 
   echo $FILES_JSON | jq
