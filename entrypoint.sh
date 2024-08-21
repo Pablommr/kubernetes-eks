@@ -173,6 +173,10 @@ applyFile () {
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
     echo "Erro ao aplicar o arquivo $file:"
     echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
+    #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
+    if ! $CONTINUE_IF_FAIL; then
+      exit 1
+    fi
   else
     echo "Arquivo aplicado com sucesso: $file"
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
@@ -186,6 +190,7 @@ applyFile () {
 #envs de usuário
 FILES_PATH=("kubernetes")
 SUBPATH=true
+CONTINUE_IF_FAIL=true
 KUBE_YAML=()
 
 
