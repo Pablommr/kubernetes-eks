@@ -111,13 +111,10 @@ createJsonFiles () {
     done
 
   else
-    echo $name_file
     #Verifica se a env que printa está vazia
     if [ -z "$name_file" ]; then
-      name_file="$file"
-      echo "Cai no if"
+      local name_file="$file"
     fi
-    echo $name_file
 
     FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += [{"file":\"$file\","print":\"$name_file\"}]")"
   fi
