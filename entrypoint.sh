@@ -167,6 +167,7 @@ applyFile () {
 
   #Applying artifact
   echo "Applying file: $file"
+  echo "Original File: $print_name"
   echo -n "$print_name" >> $GITHUB_STEP_SUMMARY
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   KUBE_EXIT_CODE=$?
