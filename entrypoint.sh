@@ -116,6 +116,7 @@ createJsonFiles () {
       local name_file="$file"
     fi
 
+    #Adiciona no Json o arquivo
     FILES_JSON="$(echo -n $FILES_JSON | jq -cr "(.$kind | .files) += [{"file":\"$file\","print":\"$name_file\"}]")"
   fi
 }
@@ -138,14 +139,17 @@ artifactType () {
 
   #Usado para formatar o output na página do github Action
   tmp_count=0
-  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[].file"); do
+  for json_file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
+    local file="$(echo -n $json_file | jq -cr '.file')"
+    local print_name="$(echo -n $json_file | jq -cr '.print')"
+
     #Alter files if ENVSUBS=true
     if [ "$ENVSUBST" = true ]; then
       envSubstitution $file
     fi
 
     #Apply file
-    applyFile $file $tmp_count
+    applyFile $file $print_name $tmp_count
     #Incrementa o Count
     tmp_count=$((tmp_count + 1))
   done
@@ -153,7 +157,8 @@ artifactType () {
 
 applyFile () {
   local file="$1"
-  local tmp_count="$2"
+  local print_name="$2"
+  local tmp_count="$3"
 
   #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
   if [ $tmp_count -gt 0 ]; then
@@ -162,7 +167,7 @@ applyFile () {
 
   #Applying artifact
   echo "Applying file: $file"
-  echo -n "$file" >> $GITHUB_STEP_SUMMARY
+  echo -n "$print_name" >> $GITHUB_STEP_SUMMARY
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   KUBE_EXIT_CODE=$?
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
