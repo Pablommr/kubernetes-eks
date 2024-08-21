@@ -136,8 +136,9 @@ artifactType () {
   echo "Type: $type"
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
 
+  #Usado para formatar o output na página do github Action
   tmp_count=0
-  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[]"); do
+  for file in $(echo -n "$FILES_JSON" | jq -cr ".$type.files[].file"); do
     #Alter files if ENVSUBS=true
     if [ "$ENVSUBST" = true ]; then
       envSubstitution $file
