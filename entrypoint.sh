@@ -249,7 +249,7 @@ for i in ${FILES_YAML[@]}; do
     done
     #Verifica se tem mais sub-diretórios além do informado
     echo "qtd_path_file: $qtd_path_file | qtd_subpath: $qtd_subpath"
-    if [ $qtd_subpath -gt $qtd_path_file ]; then
+    if [ $qtd_path_file -gt $qtd_subpath ]; then
       #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
       echo "SUBPATH=false. Ignoring file: $i"
     else
