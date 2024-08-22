@@ -234,8 +234,17 @@ for i in ${FILES_YAML[@]}; do
     #cria Json com todos os arquivos do diretório e sub-diretório
     createJsonFiles $i
   else
+    qtd_subpath_file=$(echo "$i" | tr -cd '/' | wc -c |tr -d ' ')
+    for path in "${FT_FILES_PATH[@]}"; do
+      if [ "$path/" == "$i/"* ]; then
+        echo "path: $path | i: $i"
+        qtd_path=$(echo "$path" | tr -cd '/' | wc -c |tr -d ' ')
+        break
+      fi
+    done
     #Verifica se tem mais sub-diretórios além do informado
-    if [ $(echo "$i" | tr -cd '/' | wc -c |tr -d ' ') -gt 1 ]; then
+    if [ $qtd_subpath_file -gt $qtd_path ]; then
+      #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
       echo "SUBPATH=false. Ignoring file: $i"
     else
       createJsonFiles $i
