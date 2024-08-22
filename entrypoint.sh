@@ -2,7 +2,9 @@
 
 #set -e
 #
+echo ""
 echo "Checking ENVs..."
+echo ""
 
 #Check if ENVs is fulfiled
 if [ -z "$AWS_ACCESS_KEY_ID" ]; then
@@ -18,9 +20,10 @@ elif [ -z "$KUBE_YAML" ]; then
   if [ -z "$FILES_PATH" ]; then
     echo "Envs KUBE_YAML or FILES_PATH is empty or file doesn't exist! Please, fulfil it with full path where your file is..."
     exit 1
+  else
+    echo 'Envs filled!'
+    echo ""
   fi
-else
-  echo 'Envs filled!'
 fi
 
 if [ -z "$AWS_PROFILE_NAME" ]; then
