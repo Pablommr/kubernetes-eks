@@ -234,24 +234,26 @@ for i in ${FILES_YAML[@]}; do
   #Percorre paths
   for k in "${FT_FILES_PATH[@]}"; do
     echo "k: $k"
-    #Remove da string o path informado pelo usuário
-    files_relative=$(echo "$i" | sed "s|$k/||")
-
-    # Conta o número de barras (/) no caminho e subtrai 1 para obter o número de sub-diretórios
-    num_directories=$(echo "$files_relative" | tr -cd '/' | wc -c)
-
-    if $SUBPATH; then
-      #cria Json com todos os arquivos do diretório e sub-diretório
-      createJsonFiles $i
-    else
-      #Verifica se tem mais sub-diretórios além do informado
-      if [ $num_directories -gt 0 ]; then
-        echo "Ignorando arquivo $i"
-      else
-        createJsonFiles $i
-      fi
+    if [[ "$k" == *"$i"* ]]; then
+      #Remove da string o path informado pelo usuário
+      files_relative=$(echo "$i" | sed "s|$k/||")
     fi
   done
+
+  # Conta o número de barras (/) no caminho e subtrai 1 para obter o número de sub-diretórios
+  num_directories=$(echo "$files_relative" | tr -cd '/' | wc -c)
+
+  if $SUBPATH; then
+    #cria Json com todos os arquivos do diretório e sub-diretório
+    createJsonFiles $i
+  else
+    #Verifica se tem mais sub-diretórios além do informado
+    if [ $num_directories -gt 0 ]; then
+      echo "Ignorando arquivo $i"
+    else
+      createJsonFiles $i
+    fi
+  fi
 done
 
 
