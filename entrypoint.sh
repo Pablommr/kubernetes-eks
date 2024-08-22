@@ -239,7 +239,7 @@ for i in ${FILES_YAML[@]}; do
       echo "path: $path | i: $i"
       file_wt_path=$(echo "$i" | sed "s|^$path||")
       echo "file_wt_path: $file_wt_path"
-      if [ $i != $file_wt_path ];then
+      if [ "$i" != "$file_wt_path" ];then
         echo "Cai no IF"
       fi
     done
