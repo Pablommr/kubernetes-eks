@@ -230,10 +230,9 @@ FILES_YAML+=("${FT_KUBE_YAML[@]}")
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
 
-  echo "i: $i"
   #Percorre paths
   for k in "${FT_FILES_PATH[@]}"; do
-    echo "k: $k"
+    #Verifica se uma das possibilidade de paths, caso seja um vetor, existe no path do arquivo
     if [[ "$k" == *"$i"* ]]; then
       #Remove da string o path informado pelo usuário
       files_relative=$(echo "$i" | sed "s|$k/||")
