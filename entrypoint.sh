@@ -230,31 +230,12 @@ FILES_YAML+=("${FT_KUBE_YAML[@]}")
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
 
-  #Percorre paths
-  for k in "${FT_FILES_PATH[@]}"; do
-    # Remove any trailing slashes for comparison consistency
-    k=$(echo "$k" | sed 's:/*$::')
-    i=$(echo "$i" | sed 's:/*$::')
-    #Verifica se uma das possibilidade de paths, caso seja um vetor, existe no path do arquivo
-    echo "k: $k | i: $i"
-    if [[ "$k/" == *"$i/"* ]]; then
-      #Remove da string o path informado pelo usuário
-      echo "Cai no if"
-      files_relative=$(echo -n "$i" | sed "s|$k/||")
-    fi
-  done
-
-  # Conta o número de barras (/) no caminho e subtrai 1 para obter o número de sub-diretórios
-  num_directories=$(echo -n "$files_relative" | tr -cd '/' | wc -c)
-
-  echo "num_directories: $num_directories | files_relative: $files_relative"
-
   if $SUBPATH; then
     #cria Json com todos os arquivos do diretório e sub-diretório
     createJsonFiles $i
   else
     #Verifica se tem mais sub-diretórios além do informado
-    if [ $num_directories -gt 0 ]; then
+    if [ $(echo "$i" | tr -cd '/' | wc -c |tr -d ' ') -gt 0 ]; then
       echo "Ignorando arquivo $i"
     else
       createJsonFiles $i
