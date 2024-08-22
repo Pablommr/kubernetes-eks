@@ -5,40 +5,37 @@
 echo "Checking ENVs..."
 
 #Check if ENVs is fulfiled
-if [ -z "$AWS_ACCESS_KEY_ID" ]
-then
+if [ -z "$AWS_ACCESS_KEY_ID" ]; then
   echo 'Env AWS_ACCESS_KEY_ID is empty! Please, fulfil it with your aws access key...'
   exit 1
-elif [ -z "$AWS_SECRET_ACCESS_KEY" ]
-then
+elif [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
   echo 'Env AWS_SECRET_ACCESS_KEY is empty! Please, fulfil  with your aws access secret...'
   exit 1
-elif [ -z "$KUBECONFIG" ]
-then
+elif [ -z "$KUBECONFIG" ]; then
   echo 'Env KUBECONFIG is empty! Please, fulfil it with your kubeconfig in base64...'
   exit 1
-elif [ -z "$AWS_PROFILE_NAME" ]
-then
-  AWS_PROFILE_NAME='default'
-  echo 'Env AWS_PROFILE_NAME is empty! Using default.'
-elif [ -n "$FILES_PATH" ] || [ -n "$KUBE_YAML" ]
-then
+elif [ -n "$FILES_PATH" ] || [ -n "$KUBE_YAML" ]; then
   echo "Envs KUBE_YAML or FILES_PATH is empty or file doesn't exist! Please, fulfil it with full path where your file is..."
   exit 1
-elif [ -z "$SUBPATH" ] || [ "$SUBPATH" = "true" ] || [ "$SUBPATH" = "false" ]
-then
-  SUBPATH=false
-  echo 'Env SUBPATH is empty! Using default=false.'
-elif [ -z "$CONTINUE_IF_FAIL" ] || [ "$CONTINUE_IF_FAIL" = "true" ] || [ "$CONTINUE_IF_FAIL" = "false" ]
-then
-  CONTINUE_IF_FAIL=false
-  echo 'Env CONTINUE_IF_FAIL is empty! Using default=false.'
-elif [ -z "$KUBE_ROLLOUT" ] || [ "$KUBE_ROLLOUT" = "true" ] || [ "$KUBE_ROLLOUT" = "false" ]
-then
-  KUBE_ROLLOUT=true
-  echo 'Env KUBE_ROLLOUT is empty! Using default=true.'
 else
   echo 'Envs filled!'
+fi
+
+if [ -z "$AWS_PROFILE_NAME" ]; then
+  AWS_PROFILE_NAME='default'
+  echo 'Env AWS_PROFILE_NAME is empty! Using default.'
+fi
+if [ -z "$SUBPATH" ] || [ "$SUBPATH" = "true" ] || [ "$SUBPATH" = "false" ]; then
+  SUBPATH=false
+  echo 'Env SUBPATH is empty! Using default=false.'
+fi
+if [ -z "$CONTINUE_IF_FAIL" ] || [ "$CONTINUE_IF_FAIL" = "true" ] || [ "$CONTINUE_IF_FAIL" = "false" ]; then
+  CONTINUE_IF_FAIL=false
+  echo 'Env CONTINUE_IF_FAIL is empty! Using default=false.'
+fi
+if [ -z "$KUBE_ROLLOUT" ] || [ "$KUBE_ROLLOUT" = "true" ] || [ "$KUBE_ROLLOUT" = "false" ]; then
+  KUBE_ROLLOUT=true
+  echo 'Env KUBE_ROLLOUT is empty! Using default=true.'
 fi
 
 echo ""
