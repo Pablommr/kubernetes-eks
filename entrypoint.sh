@@ -242,6 +242,8 @@ for i in ${FILES_YAML[@]}; do
   # Conta o número de barras (/) no caminho e subtrai 1 para obter o número de sub-diretórios
   num_directories=$(echo "$files_relative" | tr -cd '/' | wc -c)
 
+  echo "num_directories: $num_directories | files_relative: $files_relative"
+
   if $SUBPATH; then
     #cria Json com todos os arquivos do diretório e sub-diretório
     createJsonFiles $i
