@@ -242,8 +242,8 @@ for i in ${FILES_YAML[@]}; do
       if [ "$i" != "$file_wt_path" ];then
         echo "Cai no IF"
       fi
+      echo "---"
     done
-    echo "---"
     #Verifica se tem mais sub-diretórios além do informado
     if [ $qtd_subpath_file -gt $qtd_path ]; then
       #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
