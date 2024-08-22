@@ -33,9 +33,9 @@ if [ -z "$ENVSUBST" ]; then
   ENVSUBST=false
   echo 'Env ENVSUBST is empty! Using default=false.'
 fi
-if [ -z "$SUBPATH" ] || [ "$SUBPATH" != "true" ] || [ "$SUBPATH" != "false" ]; then
+if [ "$SUBPATH" != "true" ] && [ "$SUBPATH" != "false" ]; then
   SUBPATH=false
-  echo 'Env SUBPATH is empty! Using default=false.'
+  echo 'Env SUBPATH is empty ow wrong value! Using default=false.'
 fi
 if [ -z "$CONTINUE_IF_FAIL" ] || [ "$CONTINUE_IF_FAIL" = "true" ] || [ "$CONTINUE_IF_FAIL" = "false" ]; then
   CONTINUE_IF_FAIL=false
