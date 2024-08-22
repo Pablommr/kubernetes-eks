@@ -233,7 +233,7 @@ for i in ${FILES_YAML[@]}; do
   echo "i: $i"
   #Percorre paths
   for k in "${FT_FILES_PATH[@]}"; do
-    echo $k
+    echo "k: $k"
     #Remove da string o path informado pelo usuário
     files_relative=$(echo "$i" | sed "s|$k/||")
 
