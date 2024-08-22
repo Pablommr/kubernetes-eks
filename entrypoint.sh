@@ -233,7 +233,7 @@ for i in ${FILES_YAML[@]}; do
   #Percorre paths
   for k in "${FT_FILES_PATH[@]}"; do
     #Verifica se uma das possibilidade de paths, caso seja um vetor, existe no path do arquivo
-    if [[ "$k" == *"$i"* ]]; then
+    if [[ "/$k/" == *"$i"* ]]; then
       #Remove da string o path informado pelo usuário
       files_relative=$(echo "$i" | sed "s|$k/||")
     fi
