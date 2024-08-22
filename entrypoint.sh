@@ -201,23 +201,27 @@ applyFile () {
 ###===========================================================
 ###===========================================================
 
+#Transformando os inputs do githubaciotns em array
+IFS=',' read -r -a FT_FILES_PATH <<< "$FILES_PATH"
+IFS=',' read -r -a FT_KUBE_YAML <<< "$KUBE_YAML"
+
 # Loop para iterar sobre cada item no vetor
-for i in "${!FILES_PATH[@]}"; do
-  if [[ "${FILES_PATH[$i]}" == */ ]]; then
+for i in "${!FT_FILES_PATH[@]}"; do
+  if [[ "${FT_FILES_PATH[$i]}" == */ ]]; then
     # Remove a barra (/) do final
-    FILES_PATH[$i]="${FILES_PATH[$i]%/}"
+    FT_FILES_PATH[$i]="${FT_FILES_PATH[$i]%/}"
   fi
 done
 
-for j in "${!FILES_PATH[@]}"; do
+for j in "${!FT_FILES_PATH[@]}"; do
   #Lista de arquivos
-  FILES_YAML+=($(find ${FILES_PATH[$j]} -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
+  FILES_YAML+=($(find ${FT_FILES_PATH[$j]} -type f \( -name "*.yml" -o -name "*.yaml" \) | paste -sd ' ' -))
 done
 
 FILES_JSON='{}'
 
 #Adiciona arquivos individuais setados pelo usuário
-FILES_YAML+=("${KUBE_YAML[@]}")
+FILES_YAML+=("${FT_KUBE_YAML[@]}")
 
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
