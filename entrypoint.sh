@@ -14,9 +14,11 @@ elif [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
 elif [ -z "$KUBECONFIG" ]; then
   echo 'Env KUBECONFIG is empty! Please, fulfil it with your kubeconfig in base64...'
   exit 1
-elif [ -n "$FILES_PATH" ] || [ -n "$KUBE_YAML" ]; then
-  echo "Envs KUBE_YAML or FILES_PATH is empty or file doesn't exist! Please, fulfil it with full path where your file is..."
-  exit 1
+elif [ -z "$KUBE_YAML" ]; then
+  if [ -z "$FILES_PATH" ]; then
+    echo "Envs KUBE_YAML or FILES_PATH is empty or file doesn't exist! Please, fulfil it with full path where your file is..."
+    exit 1
+  fi
 else
   echo 'Envs filled!'
 fi
