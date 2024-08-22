@@ -239,7 +239,7 @@ for i in ${FILES_YAML[@]}; do
     #Percorre cada arquivo para contar a quantidade de path
     for path in "${FT_FILES_PATH[@]}"; do
       #Retira o path informado pelo usuário do path total do arquivo
-      file_no_path=$(echo "$i" | sed "s|^$path||")
+      file_no_path=$(echo "$i" | sed "s|^$path/||")
       #Verifica se o arquivo a ser aplicado tem em seu path um dos path (em caso de vetor) informado pelo usuário
       if [ "$i" != "$file_no_path" ];then
         echo "file_no_path: $file_no_path | i: $i"
