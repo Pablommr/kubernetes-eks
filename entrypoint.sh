@@ -227,7 +227,7 @@ FILES_YAML+=("${FT_KUBE_YAML[@]}")
 for i in ${FILES_YAML[@]}; do
 
   #Percorre paths
-  for k in "${FILES_PATH[@]}"; do
+  for k in "${FT_FILES_PATH[@]}"; do
     echo $k
     #Remove da string o path informado pelo usuário
     files_relative=$(echo "$i" | sed "s|$k/||")
