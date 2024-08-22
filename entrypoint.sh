@@ -235,6 +235,7 @@ for i in ${FILES_YAML[@]}; do
     #Verifica se uma das possibilidade de paths, caso seja um vetor, existe no path do arquivo
     if [[ "/$k/" == *"$i"* ]]; then
       #Remove da string o path informado pelo usuário
+      echo "Cai no if"
       files_relative=$(echo "$i" | sed "s|$k/||")
     fi
   done
