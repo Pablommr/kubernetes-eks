@@ -238,8 +238,12 @@ for i in ${FILES_YAML[@]}; do
     for path in "${FT_FILES_PATH[@]}"; do
       echo "path: $path | i: $i"
       file_wt_path=$(echo "$i" | sed "s|^$path||")
-      echo $file_wt_path
+      echo "file_wt_path: $file_wt_path"
+      if [ $i != $file_wt_path ];then
+        echo "Cai no IF"
+      fi
     done
+    echo "---"
     #Verifica se tem mais sub-diretórios além do informado
     if [ $qtd_subpath_file -gt $qtd_path ]; then
       #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
