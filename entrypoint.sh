@@ -29,6 +29,10 @@ if [ -z "$AWS_PROFILE_NAME" ]; then
   AWS_PROFILE_NAME='default'
   echo 'Env AWS_PROFILE_NAME is empty! Using default.'
 fi
+if [ -z "$ENVSUBST" ]; then
+  ENVSUBST=false
+  echo 'Env ENVSUBST is empty! Using default=false.'
+fi
 if [ -z "$SUBPATH" ] || [ "$SUBPATH" = "true" ] || [ "$SUBPATH" = "false" ]; then
   SUBPATH=false
   echo 'Env SUBPATH is empty! Using default=false.'
@@ -226,6 +230,7 @@ FILES_YAML+=("${FT_KUBE_YAML[@]}")
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
 
+  echo "i: $i"
   #Percorre paths
   for k in "${FT_FILES_PATH[@]}"; do
     echo $k
