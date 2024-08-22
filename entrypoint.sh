@@ -4,7 +4,6 @@
 #
 echo ""
 echo "Checking ENVs..."
-echo ""
 
 #Check if ENVs is fulfiled
 if [ -z "$AWS_ACCESS_KEY_ID" ]; then
@@ -198,7 +197,9 @@ applyFile () {
   echo "============================="
 }
 
-###=============
+###===========================================================
+###===========================================================
+###===========================================================
 
 # Loop para iterar sobre cada item no vetor
 for i in "${!FILES_PATH[@]}"; do
@@ -221,23 +222,26 @@ FILES_YAML+=("${KUBE_YAML[@]}")
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
 
-  #Remove da string o path informado pelo usuário
-  files_relative=$(echo "$i" | sed "s|$FILES_PATH/||")
+  #Percorre paths
+  for k in "${FILES_PATH[@]}"; do
+    #Remove da string o path informado pelo usuário
+    files_relative=$(echo "$i" | sed "s|$k/||")
 
-  # Conta o número de barras (/) no caminho e subtrai 1 para obter o número de sub-diretórios
-  num_directories=$(echo "$files_relative" | tr -cd '/' | wc -c)
+    # Conta o número de barras (/) no caminho e subtrai 1 para obter o número de sub-diretórios
+    num_directories=$(echo "$files_relative" | tr -cd '/' | wc -c)
 
-  if $SUBPATH; then
-    #cria Json com todos os arquivos do diretório e sub-diretório
-    createJsonFiles $i
-  else
-    #Verifica se tem mais sub-diretórios além do informado
-    if [ $num_directories -gt 0 ]; then
-      echo "Ignorando arquivo $i"
-    else
+    if $SUBPATH; then
+      #cria Json com todos os arquivos do diretório e sub-diretório
       createJsonFiles $i
+    else
+      #Verifica se tem mais sub-diretórios além do informado
+      if [ $num_directories -gt 0 ]; then
+        echo "Ignorando arquivo $i"
+      else
+        createJsonFiles $i
+      fi
     fi
-  fi
+  done
 done
 
 
