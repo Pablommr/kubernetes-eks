@@ -242,14 +242,13 @@ for i in ${FILES_YAML[@]}; do
       file_no_path=$(echo "$i" | sed "s|^$path/||")
       #Verifica se o arquivo a ser aplicado tem em seu path um dos path (em caso de vetor) informado pelo usuário
       if [ "$i" != "$file_no_path" ];then
-        echo "file_no_path: $file_no_path | i: $i"
         qtd_subpath=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
-        echo "qtd_subpath: $qtd_subpath"
       fi
     done
     #Verifica se tem mais sub-diretórios além do informado
-    echo "qtd_path_file: $qtd_path_file | qtd_subpath: $qtd_subpath"
-    if [ $qtd_path_file -gt $qtd_subpath ]; then
+    echo "qtd_subpath: $qtd_subpath | qtd_path_file: $qtd_path_file"
+    echo "i: $i"
+    if [ $qtd_subpath -gt $qtd_path_file ]; then
       #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
       echo "SUBPATH=false. Ignoring file: $i"
     else
