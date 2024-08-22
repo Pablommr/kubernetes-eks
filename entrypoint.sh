@@ -231,13 +231,12 @@ FILES_YAML+=("${FT_KUBE_YAML[@]}")
 for i in ${FILES_YAML[@]}; do
 
   if $SUBPATH; then
-    echo "IF SUBPATH | i: $i"
     #cria Json com todos os arquivos do diretório e sub-diretório
     createJsonFiles $i
   else
     #Verifica se tem mais sub-diretórios além do informado
     if [ $(echo "$i" | tr -cd '/' | wc -c |tr -d ' ') -gt 1 ]; then
-      echo "Ignorando arquivo $i"
+      echo "SUBPATH=false, ignoring file: $i"
     else
       createJsonFiles $i
     fi
