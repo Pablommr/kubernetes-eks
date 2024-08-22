@@ -236,12 +236,14 @@ for i in ${FILES_YAML[@]}; do
   else
     #Verifica se tem mais sub-diretórios além do informado
     if [ $(echo "$i" | tr -cd '/' | wc -c |tr -d ' ') -gt 1 ]; then
-      echo "SUBPATH=false, ignoring file: $i"
+      echo "SUBPATH=false. Ignoring file: $i"
     else
       createJsonFiles $i
     fi
   fi
 done
+
+echo ""
 
 
 echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
