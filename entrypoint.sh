@@ -236,11 +236,9 @@ for i in ${FILES_YAML[@]}; do
   else
     qtd_subpath_file=$(echo "$i" | tr -cd '/' | wc -c |tr -d ' ')
     for path in "${FT_FILES_PATH[@]}"; do
-      if [ "$path/" == "$i/"* ]; then
-        echo "path: $path | i: $i"
-        qtd_path=$(echo "$path" | tr -cd '/' | wc -c |tr -d ' ')
-        break
-      fi
+      echo "path: $path | i: $i"
+      file_wt_path=$(echo "$i" | sed "s|^$path||")
+      echo $file_wt_path
     done
     #Verifica se tem mais sub-diretórios além do informado
     if [ $qtd_subpath_file -gt $qtd_path ]; then
