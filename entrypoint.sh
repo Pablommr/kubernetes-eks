@@ -235,7 +235,7 @@ for i in ${FILES_YAML[@]}; do
     createJsonFiles $i
   else
     #Verifica se tem mais sub-diretórios além do informado
-    if [ $(echo "$i" | tr -cd '/' | wc -c |tr -d ' ') -gt 0 ]; then
+    if [ $(echo "$i" | tr -cd '/' | wc -c |tr -d ' ') -gt 1 ]; then
       echo "Ignorando arquivo $i"
     else
       createJsonFiles $i
