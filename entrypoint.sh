@@ -33,7 +33,7 @@ if [ -z "$ENVSUBST" ]; then
   ENVSUBST=false
   echo 'Env ENVSUBST is empty! Using default=false.'
 fi
-if [ -z "$SUBPATH" ] || [ "$SUBPATH" = "true" ] || [ "$SUBPATH" = "false" ]; then
+if [ -z "$SUBPATH" ] || [ "$SUBPATH" != "true" ] || [ "$SUBPATH" != "false" ]; then
   SUBPATH=false
   echo 'Env SUBPATH is empty! Using default=false.'
 fi
