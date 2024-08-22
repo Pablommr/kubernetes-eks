@@ -235,7 +235,7 @@ for i in ${FILES_YAML[@]}; do
     createJsonFiles $i
   else
     #Quantidade total de subpath no arquivo a ser aplicado
-    qtd_subpath_file=$(echo "$i" | tr -cd '/' | wc -c | tr -d ' ')
+    qtd_path_file=$(echo "$i" | tr -cd '/' | wc -c | tr -d ' ')
     #Percorre cada arquivo para contar a quantidade de path
     for path in "${FT_FILES_PATH[@]}"; do
       #Retira o path informado pelo usuário do path total do arquivo
@@ -243,13 +243,13 @@ for i in ${FILES_YAML[@]}; do
       #Verifica se o arquivo a ser aplicado tem em seu path um dos path (em caso de vetor) informado pelo usuário
       if [ "$i" != "$file_no_path" ];then
         echo "file_no_path: $file_no_path | i: $i"
-        qtd_path=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
-        echo "qtd_path: $qtd_path"
+        qtd_subpath=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
+        echo "qtd_subpath: $qtd_subpath"
       fi
     done
     #Verifica se tem mais sub-diretórios além do informado
-    echo "qtd_subpath_file: $qtd_subpath_file | qtd_path: $qtd_path"
-    if [ $qtd_path -gt $qtd_subpath_file ]; then
+    echo "qtd_path_file: $qtd_path_file | qtd_subpath: $qtd_subpath"
+    if [ $qtd_subpath -gt $qtd_path_file ]; then
       #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
       echo "SUBPATH=false. Ignoring file: $i"
     else
