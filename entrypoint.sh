@@ -351,11 +351,13 @@ pods_artifacts=(
   "Pod"
 )
 
-for type in $pods_artifacts; do
-  if [ "$KUBE_ROLLOUT" = true ]; then
-    artifactType $type true
-  else
-    artifactType $type false
+for type in ${pods_artifacts[@]}; do
+  if echo -n "$FILES_JSON" | jq -e ".$type" > /dev/null; then
+    if [ "$KUBE_ROLLOUT" = true ]; then
+      artifactType $type true
+    else
+      artifactType $type false
+    fi
   fi
 done
 
@@ -364,9 +366,11 @@ last_apply=(
   "ScaledObject"
 )
 
-for type in $last_apply; do
-  if [ "$KUBE_ROLLOUT" = true ]; then
-    artifactType $type false
+for type in ${last_apply[@]}; do
+  if echo -n "$FILES_JSON" | jq -e ".$type" > /dev/null; then
+    if [ "$KUBE_ROLLOUT" = true ]; then
+      artifactType $type false
+    fi
   fi
 done
 
