@@ -189,7 +189,7 @@ artifactType () {
     local print_name="$(echo -n $json_file | jq -cr '.print')"
 
     #Alter files if ENVSUBS=true
-    if [ "$ENVSUBST" = true ]; then
+    if [ $ENVSUBST = true ]; then
       envSubstitution $file
     fi
 
@@ -223,6 +223,7 @@ applyFile () {
     echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
     #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
     echo "KUBE_EXIT_CODE: $KUBE_EXIT_CODE"
+    echo "KUBECTL_OUTPUT: $KUBE_APPLY"
     if ! $CONTINUE_IF_FAIL; then
       exit 1
     fi
