@@ -189,6 +189,7 @@ artifactType () {
     local print_name="$(echo -n $json_file | jq -cr '.print')"
 
     #Alter files if ENVSUBS=true
+    echo "ENVSUBST: $ENVSUBST"
     if [ "$ENVSUBST" = "true" ]; then
       envSubstitution $file
     fi
