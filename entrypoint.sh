@@ -72,9 +72,9 @@ check_directories_and_files() {
   for dir in "${dirs[@]}"; do
     if [ -d "$dir" ]; then
       # Verifica se há pelo menos um arquivo .yaml ou .yml no diretório
-      if ! ls "$dir"/*.ya?ml > /dev/null 2>&1; then
-        echo "No files .yaml or .yml fpund in dir: $dir"
-        echo "No files .yaml or .yml fpund in dir: $dir" >> $GITHUB_STEP_SUMMARY
+      if ! find "$dir" -maxdepth 1 -type f \( -name "*.yaml" -o -name "*.yml" \) | grep -q .; then
+        echo "No files .yaml or .yml found in dir: $dir"
+        echo "No files .yaml or .yml found in dir: $dir" >> $GITHUB_STEP_SUMMARY
         exit 1
       fi
     else
