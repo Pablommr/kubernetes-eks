@@ -29,7 +29,7 @@ if [ -z "$AWS_PROFILE_NAME" ]; then
   AWS_PROFILE_NAME='default'
   echo 'Env AWS_PROFILE_NAME is empty! Using default.'
 fi
-if [ -z "$ENVSUBST" ]; then
+if [ "$ENVSUBST" != "true" ] && [ "$SUBPATH" != "ENVSUBST" ]; then
   ENVSUBST=false
   echo 'Env ENVSUBST is empty! Using default=false.'
 fi
@@ -189,7 +189,7 @@ artifactType () {
     local print_name="$(echo -n $json_file | jq -cr '.print')"
 
     #Alter files if ENVSUBS=true
-    if [[ "$ENVSUBST" == "true" ]]; then
+    if [ "$ENVSUBST" = "true" ]; then
       envSubstitution $file
     fi
 
@@ -219,7 +219,7 @@ applyFile () {
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   KUBE_EXIT_CODE=$?
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
-    echo "Erro ao aplicar o arquivo $file:"
+    echo "Erro ao aplicar o arquivo: $file"
     echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
     #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
     echo "KUBE_EXIT_CODE: $KUBE_EXIT_CODE"
