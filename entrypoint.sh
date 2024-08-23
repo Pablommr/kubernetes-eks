@@ -166,6 +166,8 @@ createJsonFiles () {
 envSubstitution () {
   local file="$1"
 
+  echo "Change envs in file: $file"
+
   for ENV_VAR in $(env |cut -f 1 -d =); do
     local VAR_KEY=$ENV_VAR
     local VAR_VALUE=$(eval echo \$$ENV_VAR | sed -e 's/\//\\&/g;s/\&/\\&/g;')
