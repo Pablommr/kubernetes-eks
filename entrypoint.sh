@@ -224,8 +224,12 @@ done
 
 FILES_JSON='{}'
 
+echo "FILES_YAML ANTES: $FILES_YAML"
+
 #Adiciona arquivos individuais setados pelo usuário
 FILES_YAML+=("${FT_KUBE_YAML[@]}")
+
+echo "FILES_YAML DEPOIS: $FILES_YAML"
 
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
@@ -246,8 +250,6 @@ for i in ${FILES_YAML[@]}; do
       fi
     done
     #Verifica se tem mais sub-diretórios além do informado
-    echo "qtd_subpath: $qtd_subpath | qtd_path_file: $qtd_path_file"
-    echo "i: $i"
     if [ $qtd_subpath -gt 0 ]; then
       #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
       echo "SUBPATH=false. Ignoring file: $i"
