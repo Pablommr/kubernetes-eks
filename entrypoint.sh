@@ -64,6 +64,53 @@ echo "$KUBECONFIG" |base64 -d > $(eval echo $KUBECONFIG_PATH)
 #Unset var to make sure ther are no conflict
 unset KUBECONFIG
 
+
+###================================
+#Functions
+check_directories_and_files() {
+  local dirs=("$@")
+  for dir in "${dirs[@]}"; do
+    if [ -d "$dir" ]; then
+      # Verifica se há pelo menos um arquivo .yaml ou .yml no diretório
+      if ! ls "$dir"/*.ya?ml > /dev/null 2>&1; then
+        echo "No files .yaml or .yml fpund in dir: $dir"
+        echo "No files .yaml or .yml fpund in dir: $dir" >> $GITHUB_STEP_SUMMARY
+        exit 1
+      fi
+    else
+      echo "Path $dir doen't exist."
+      echo "Path $dir doen't exist." >> $GITHUB_STEP_SUMMARY
+      exit 1
+    fi
+  done
+}
+
+check_files_exist() {
+  local files=("$@")
+  for file in "${files[@]}"; do
+    if [ -e "$file" ]; then
+      check_yaml_files $file
+    else
+      echo "File: $file not found, Please, check if file path is set correctly."
+      echo "File: $file not found, Please, check if file path is set correctly." >> $GITHUB_STEP_SUMMARY
+      exit 1
+    fi
+  done
+}
+
+check_yaml_files() {
+  local files=("$@")
+  for file in "${files[@]}"; do
+    if [[ "$file" =~ \.ya?ml$ ]]; then
+      echo "O arquivo $file tem uma extensão válida (.yaml ou .yml)."
+    else
+      echo "File: $file with extension not allowed. Please declare \"*.yaml\" or \"*.yml\""
+      echo "File: $file with extension not allowed. Please declare \"*.yaml\" or \"*.yml\"" >> $GITHUB_STEP_SUMMARY
+      exit 1
+    fi
+  done
+}
+
 #Cria Json com arquivos a serem aplicados
 createJsonFiles () {
   #Local do arquivo a ser aplicado
@@ -209,6 +256,17 @@ applyFile () {
 IFS=',' read -r -a FT_FILES_PATH <<< "$FILES_PATH"
 IFS=',' read -r -a FT_KUBE_YAML <<< "$KUBE_YAML"
 
+
+#Valida se os paths existem
+if [ ${#FT_FILES_PATH[@]} -gt 0 ]; then
+  check_directories_and_files ${FT_FILES_PATH[@]}
+fi
+
+#Valida se os arquivos existem e possuem extensões válidas
+if [ ${#FT_KUBE_YAML[@]} -gt 0 ]; then
+  check_files_exist ${FT_KUBE_YAML[@]}
+fi
+
 # Loop para iterar sobre cada item no vetor
 for i in "${!FT_FILES_PATH[@]}"; do
   if [[ "${FT_FILES_PATH[$i]}" == */ ]]; then
@@ -224,12 +282,8 @@ done
 
 FILES_JSON='{}'
 
-echo "FILES_YAML ANTES: ${FILES_YAML[@]}"
-
 #Adiciona arquivos individuais setados pelo usuário
 FILES_YAML+=("${FT_KUBE_YAML[@]}")
-
-echo "FILES_YAML DEPOIS: ${FILES_YAML[@]}"
 
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
@@ -251,7 +305,6 @@ for i in ${FILES_YAML[@]}; do
     done
     #Verifica se tem mais sub-diretórios além do informado
     if [ $qtd_subpath -gt 0 ]; then
-      #VERIFICAR SE O ARQUIVO $I EXISTE NO VETOR ${FT_KUBE_YAML[@]}
       echo "SUBPATH=false. Ignoring file: $i"
     else
       createJsonFiles $i
