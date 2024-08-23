@@ -173,8 +173,6 @@ envSubstitution () {
     local VAR_VALUE=$(eval echo \$$ENV_VAR | sed -e 's/\//\\&/g;s/\&/\\&/g;')
     sed -i "s/\$$VAR_KEY/$VAR_VALUE/g" $file
   done
-  echo "Cat após sed:"
-  cat $file
 }
 
 artifactType () {
