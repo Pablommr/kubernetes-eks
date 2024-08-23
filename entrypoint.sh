@@ -211,8 +211,9 @@ applyFile () {
 
   #Applying artifact
   echo "Applying file: $file"
+  echo -n "$(grep "metadata:" -A 1 $file | grep "name:" | awk '{print $2}')" >> $GITHUB_STEP_SUMMARY
   echo "Original file: $print_name"
-  echo -n "$print_name" >> $GITHUB_STEP_SUMMARY
+  echo -n " | $print_name" >> $GITHUB_STEP_SUMMARY
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   KUBE_EXIT_CODE=$?
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
@@ -313,8 +314,8 @@ done
 echo ""
 
 
-echo "| Type        | Files   | Status  |" >> $GITHUB_STEP_SUMMARY
-echo "|-------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+echo "| Type        | Resource Name  | File    | Status  |" >> $GITHUB_STEP_SUMMARY
+echo "|-------------|----------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
 
 echo "Files to apply:"
 echo $FILES_JSON | jq
