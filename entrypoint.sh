@@ -101,9 +101,7 @@ check_files_exist() {
 check_yaml_files() {
   local files=("$@")
   for file in "${files[@]}"; do
-    if [[ "$file" =~ \.ya?ml$ ]]; then
-      echo "O arquivo $file tem uma extensão válida (.yaml ou .yml)."
-    else
+    if [[ ! "$file" =~ \.ya?ml$ ]]; then
       echo "File: $file with extension not allowed. Please declare \"*.yaml\" or \"*.yml\""
       echo "File: $file with extension not allowed. Please declare \"*.yaml\" or \"*.yml\"" >> $GITHUB_STEP_SUMMARY
       exit 1
