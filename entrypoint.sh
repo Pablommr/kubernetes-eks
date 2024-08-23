@@ -236,14 +236,14 @@ applyFile () {
   if [ "$kube_rollout" == true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
     echo ""
     echo "Applying rollout:"
-    kubectl rollout restart --filename $KUBE_YAML
+    kubectl rollout restart --filename $file
     echo ""
     echo "Checking rollout status:"
-    kubectl rollout status --filename $KUBE_YAML
+    kubectl rollout status --filename $file
   elif [ "$kube_rollout" = true ] && ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
     echo ""
     echo "Checking rollout status:"
-    kubectl rollout status --filename $KUBE_YAML
+    kubectl rollout status --filename $file
   fi
 
   echo "$KUBE_APPLY"
