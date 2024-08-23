@@ -224,12 +224,12 @@ done
 
 FILES_JSON='{}'
 
-echo "FILES_YAML ANTES: $FILES_YAML"
+echo "FILES_YAML ANTES: ${FILES_YAML[@]}"
 
 #Adiciona arquivos individuais setados pelo usuário
 FILES_YAML+=("${FT_KUBE_YAML[@]}")
 
-echo "FILES_YAML DEPOIS: $FILES_YAML"
+echo "FILES_YAML DEPOIS: ${FILES_YAML[@]}"
 
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
