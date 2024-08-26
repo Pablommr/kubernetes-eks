@@ -2,7 +2,7 @@
 
 Action to apply artifacts files in your [EKS](https://aws.amazon.com/pt/eks/) cluster.
 
-This action enables you to apply kubernetes artifacts files just pointing the path where your file is.
+This action allows you to apply Kubernetes artifact files by simply pointing to the path where your file is located.
 
 <br>
 
@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Deployment
-        uses: Pablommr/kubernetes-eks@v1.2.0
+        uses: Pablommr/kubernetes-eks@v2.0.0
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -35,7 +35,7 @@ jobs:
 <br>
 
 # Usage
-To use this action, you just need a user that have heve permission to apply artifacts in your EKS cluster (More info see in this [link](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html)), and setup some ENV's variables listed next.
+To use this action, you just need a user that has permission to apply artifacts in your EKS cluster. For more information, see this [link](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html). Also, set up the necessary environment variables listed below.
 
 <br>
 
@@ -53,11 +53,14 @@ AWS secret key for IAM role.
 
 ### `KUBECONFIG`
 
-Environment variable name containing base64-encoded kubeconfig data. Need atention with profile name that must be the same in AWS_PROFILE_NAME.
+Environment variable containing the base64-encoded kubeconfig data. Pay attention to the profile name; it must match the AWS_PROFILE_NAME.
 
-### `KUBE_YAML`
+### `KUBE_YAML` or `FILES_PATH`
 
-Path to file used to create/update the resource.
+One of them (or both) must be set. <br><br>
+KUBE_YAML is the path of <b>file</b> to file used to create/update the resource. This env can be an array with more then 1 file. (I.e. kubernetes/deployment.yml,artifacts/configmap.yaml )<br>
+FILES_PATH if the path of <b>directories</b> where the files are. All files in this directory will be applied.<br><br>
+The files must be with *.yaml or *.yml extensions.
 
 <br>
 
@@ -72,38 +75,50 @@ Profile name to be configured. If not passed, this env assume the value 'default
 
 Whether to run envsubst to substitute environment variables inside the file in KUBE_YAML. Your variable inside your file need begin with "$". If not passed, this env assume the value 'false'
 
+### `SUBPATH`
+(boolean)
+
+If you use path in env FILES_PATH, you can set this env to true to apply files in subdirectory. Default value is false.
+
+### `CONTINUE_IF_FAIL`
+(boolean)
+
+If you use path in env FILES_PATH, you can set this env to true to continue applying files in case of fail in one file. Default value is false.
+
 ### `KUBE_ROLLOUT`
 (boolean)
 
-Whether to watch the status of the latest rollout until it's done. The rollout onlly works to deployment/statefulset/daemonset and only be executed if the POD's applyed by KUBE_YAML finalize with unchaged status.
+Whether to watch the status of the latest rollout until it's done. The rollout only works for Deployment, StatefulSet, or DaemonSet resources and will only be executed if the Pods applied by KUBE_YAML finalize with an unchanged status.
 
 <br>
 
 # Use case
 
-Let's suppose you need apply 3 artifacts in you EKS, one deployment, one service, and one configmap, add all your kubernetes artifacts are inside in folder kubernetes, some like this:
+Let's suppose you need to apply three artifacts in your EKS: one Deployment, one Service, and one ConfigMap. All your Kubernetes artifacts are inside the kubernetes folder, like this:
 
 ```
 ├── README.md
 ├── app
 |  └── files
 ├── kubernetes
-|  ├── service.yml
-|  ├── configmap.yaml
-|  └── deployment.yml
+│   ├── deployment.yaml
+│   ├── envs
+│   │   ├── prod
+│   │   │   └── configmap.yaml
+│   │   └── staging
+│   │       └── configmap.yaml
+│   └── service.yaml
 └── another_files
 ```
-You already set up your build and just need apply in your kubernetes. You have the premise that always the pipeline run, even that change was in the configmap for exemple, you will need rollout the pods, and you will need too substitute your variables inside deployment.yml for some another value. Let's assume you want to change the image tag, so you can name your tag in image line in deployment.yml with some name, for example $IMAGE_TAG, like this:
+You've already set up your build and just need to apply it in Kubernetes. Even if the only change was in the ConfigMap, you will need to roll out the pods. You want to apply just the prod ConfigMap, and you also need to substitute variables inside deployment.yml for some other value. Let's assume you want to change the image tag, so you can name your tag in the image line in deployment.yml with a placeholder, for example $IMAGE_TAG, like this:
 
 ```
 image: nginx:$IMAGE_TAG
 ```
 
-And then pass the IMAGE_TAG as a env with value wished. 
+Then, pass the IMAGE_TAG as an environment variable with the desired value.
 
- So, you can configure your pipeline in this way:
-
-
+You can configure your pipeline like this:
 
 ```yml
 name: Build
@@ -125,40 +140,38 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_and_push
     steps:
-      -
-        name: Checkout 
+      - name: Checkout 
         uses: actions/checkout@v3
-      -
-        name: Service
-        uses: Pablommr/kubernetes-eks@v1.2.0
+      - name: Deploy
+        uses: Pablommr/kubernetes-eks@v2.0.0
         env:
-          KUBE_YAML: kubernetes/service.yml
-      -
-        name: Configmap
-        uses: Pablommr/kubernetes-eks@v1.2.0
-        env:
-          KUBE_YAML: kubernetes/configmap.yml
-      -
-        name: Deployment
-        uses: Pablommr/kubernetes-eks@v1.2.0
-        env:
-          KUBE_YAML: kubernetes/deployment.yml
+          FILES_PATH: kubernetes
+          KUBE_YAML: kubernetes/envs/configmap.yaml
+          SUBPATH: false #Defaul value
           ENVSUBST: true
           KUBE_ROLLOUT: true
           IMAGE_TAG: 1.21.6
 ```
 
+In this setup, with FILES_PATH: kubernetes, you will apply all files under the kubernetes path (deployment.yaml and service.yaml), but none under env, since SUBPATH is set to false. However, you will still apply the ConfigMap with KUBE_YAML: kubernetes/envs/configmap.yaml.
+
 <br>
 
 # Change Log
 
-## v1.2.0
+## v2.0.0
+
+- Added possibilitie to add path (env FILES_PATH) to apply multiple files
+- Added env SUBPATH to apply files in supath
+- added env CONTINUE_IF_FAIL to continue applying files in fail case
+
+## v2.0.0
 
 - Changed strategy to use an image that has already been built with dependencies in public registry [kubernetes-eks](https://hub.docker.com/r/pablommr/kubernetes-eks), decreasing action execution time
 
 ## v1.1.0
 
-- Add otpion to KUBE_ROLLOUT follow the rollout status in Action page
+- Added otpion to KUBE_ROLLOUT follow the rollout status in Action page
 - Fix metacharacter replacement in ENVSUBST
 
 ## v1.0.0
