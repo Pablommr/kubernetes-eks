@@ -59,7 +59,7 @@ Environment variable containing the base64-encoded kubeconfig data. Pay attentio
 
 One of them (or both) must be set. <br><br>
 KUBE_YAML is the path of <b>file</b> to file used to create/update the resource. This env can be an array with more then 1 file. (I.e. kubernetes/deployment.yml,artifacts/configmap.yaml )<br>
-FILES_PATH if the path of <b>directories</b> where the files are. All files in this directory will be applied.<br><br>
+FILES_PATH is the path of the <b>directory</b> where the files are located. All files in this directory will be applied.<br><br>
 The files must be with *.yaml or *.yml extensions.
 
 <br>
