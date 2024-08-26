@@ -165,7 +165,7 @@ In this setup, with FILES_PATH: kubernetes, you will apply all files under the k
 - Added env SUBPATH to apply files in supath
 - added env CONTINUE_IF_FAIL to continue applying files in fail case
 
-## v2.0.0
+## v1.2.0
 
 - Changed strategy to use an image that has already been built with dependencies in public registry [kubernetes-eks](https://hub.docker.com/r/pablommr/kubernetes-eks), decreasing action execution time
 
