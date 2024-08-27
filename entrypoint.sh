@@ -37,11 +37,11 @@ if [ "$SUBPATH" != "true" ] && [ "$SUBPATH" != "false" ]; then
   SUBPATH=false
   echo 'Env SUBPATH is empty ow wrong value! Using default=false.'
 fi
-if [ -z "$CONTINUE_IF_FAIL" ] || [ "$CONTINUE_IF_FAIL" = "true" ] || [ "$CONTINUE_IF_FAIL" = "false" ]; then
+if [ "$CONTINUE_IF_FAIL" != "true" ] && [ "$CONTINUE_IF_FAIL" != "false" ]; then
   CONTINUE_IF_FAIL=false
   echo 'Env CONTINUE_IF_FAIL is empty! Using default=false.'
 fi
-if [ -z "$KUBE_ROLLOUT" ] || [ "$KUBE_ROLLOUT" = "true" ] || [ "$KUBE_ROLLOUT" = "false" ]; then
+if [ "$KUBE_ROLLOUT" != "true" ] && [ "$KUBE_ROLLOUT" != "false" ]; then
   KUBE_ROLLOUT=true
   echo 'Env KUBE_ROLLOUT is empty! Using default=true.'
 fi
