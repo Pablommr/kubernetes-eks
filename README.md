@@ -163,7 +163,8 @@ In this setup, with FILES_PATH: kubernetes, you will apply all files under the k
 
 - Added possibilitie to add path (env FILES_PATH) to apply multiple files
 - Added env SUBPATH to apply files in supath
-- added env CONTINUE_IF_FAIL to continue applying files in fail case
+- Added env CONTINUE_IF_FAIL to continue applying files in fail case
+- Added output on github action page
 
 ## v1.2.0
 
