@@ -35,7 +35,7 @@ if [ "$ENVSUBST" != "true" ] && [ "$SUBPATH" != "ENVSUBST" ]; then
 fi
 if [ "$SUBPATH" != "true" ] && [ "$SUBPATH" != "false" ]; then
   SUBPATH=false
-  echo 'Env SUBPATH is empty ow wrong value! Using default=false.'
+  echo 'Env SUBPATH is empty or wrong value! Using default=false.'
 fi
 if [ "$CONTINUE_IF_FAIL" != "true" ] && [ "$CONTINUE_IF_FAIL" != "false" ]; then
   CONTINUE_IF_FAIL=false
