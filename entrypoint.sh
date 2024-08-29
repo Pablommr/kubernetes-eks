@@ -335,7 +335,7 @@ fi
 for type in $(echo -n "$FILES_JSON" | jq -cr 'keys[]'); do
   #Verifica se o type não é o tipo Namespace, que já foi aplicado, e se não são artefatos que contém pod para aplicar por último
   if [[ "$type" != "Namespace" ]] && \
-#     [[ "$type" != "ScaledObject" ]] && \
+     [[ "$type" != "ScaledObject" ]] && \
      [[ "$type" != "Deployment" ]] && \
      [[ "$type" != "ReplicaSet" ]] && \
      [[ "$type" != "DaemonSet" ]] && \
@@ -363,17 +363,15 @@ for type in ${pods_artifacts[@]}; do
 done
 
 #Aplica por último. Necessário por o keda(ScaledObject) quebra se o deployment não existir
-#last_apply=(
-#  "ScaledObject"
-#)
-#
-#for type in ${last_apply[@]}; do
-#  if echo -n "$FILES_JSON" | jq -e ".$type" > /dev/null; then
-#    if [ "$KUBE_ROLLOUT" = true ]; then
-#      artifactType $type false
-#    fi
-#  fi
-#done
+last_apply=(
+  "ScaledObject"
+)
+
+for type in ${last_apply[@]}; do
+  if echo -n "$FILES_JSON" | jq -e ".$type" > /dev/null; then
+    artifactType $type false
+  fi
+done
 
 echo ""
 echo "All done! =D"
