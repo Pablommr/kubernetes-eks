@@ -216,6 +216,10 @@ applyFile () {
   echo -n "$(grep -w "^  name:" $file | awk '{print $2}')" >> $GITHUB_STEP_SUMMARY
   echo "Original file: $print_name"
   echo -n " | $print_name" >> $GITHUB_STEP_SUMMARY
+  echo "==========="
+  echo "Print file: $file"
+  cat -A $file
+  echo "==========="
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   KUBE_EXIT_CODE=$?
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
