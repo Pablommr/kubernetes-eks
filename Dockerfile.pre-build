@@ -1,7 +1,9 @@
 FROM ubuntu:22.04
 
 RUN apt-get update -y && \
-    apt-get install unzip curl jq uuid-runtime -y && \
+    apt-get install unzip curl jq wget uuid-runtime -y && \
+    wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq && \
+    chmod +x /usr/local/bin/yq && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \    

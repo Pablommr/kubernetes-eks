@@ -115,7 +115,7 @@ createJsonFiles () {
   local file="$1"
   #Env que será usada para realizar o print na página do Actions
   local name_file="$2"
-  local kind="$(sed -n '/^kind: /{p; q;}' $file | cut -d ':' -f2 | tr -d ' ')"
+  local kind="$(yq eval '.kind' $file)"
 
   #Folder que será usado para amarzernar os arquivos splitados
   local folder_split='csplit'
