@@ -115,7 +115,7 @@ createJsonFiles () {
   local file="$1"
   #Env que será usada para realizar o print na página do Actions
   local name_file="$2"
-  local kind="$(sed -n '/^kind: /{p; q;}' $file | cut -d ':' -f2 | tr -d ' ')"
+  local kind="$(yq eval '.kind' $file)"
 
   #Folder que será usado para amarzernar os arquivos splitados
   local folder_split='csplit'
@@ -213,7 +213,7 @@ applyFile () {
 
   #Applying artifact
   echo "Applying file: $file"
-  echo -n "$(grep -w "^  name:" $file | awk '{print $2}')" >> $GITHUB_STEP_SUMMARY
+  echo -n "$(yq eval '.metadata.name' $file)" >> $GITHUB_STEP_SUMMARY
   echo "Original file: $print_name"
   echo -n " | $print_name" >> $GITHUB_STEP_SUMMARY
   echo "==========="
