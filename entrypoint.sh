@@ -213,7 +213,7 @@ applyFile () {
 
   #Applying artifact
   echo "Applying file: $file"
-  echo -n "$(grep -w "^  name:" $file | awk '{print $2}')" >> $GITHUB_STEP_SUMMARY
+  echo -n "$(yq eval '.metadata.name' $file)" >> $GITHUB_STEP_SUMMARY
   echo "Original file: $print_name"
   echo -n " | $print_name" >> $GITHUB_STEP_SUMMARY
   echo "==========="
