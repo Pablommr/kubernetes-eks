@@ -20,10 +20,10 @@ jobs:
     steps:
       -
         name: Checkout 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Deployment
-        uses: Pablommr/kubernetes-eks@v2.0.0
+        uses: Pablommr/kubernetes-eks@v2.0.1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -141,9 +141,9 @@ jobs:
     needs: build_and_push
     steps:
       - name: Checkout 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Deploy
-        uses: Pablommr/kubernetes-eks@v2.0.0
+        uses: Pablommr/kubernetes-eks@v2.0.1
         env:
           FILES_PATH: kubernetes
           KUBE_YAML: kubernetes/envs/configmap.yaml
