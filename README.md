@@ -18,11 +18,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout 
+      - name: Checkout 
         uses: actions/checkout@v4
-      -
-        name: Deployment
+      - name: Deployment
         uses: Pablommr/kubernetes-eks@v2.0.1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
