@@ -159,6 +159,11 @@ In this setup, with FILES_PATH: kubernetes, you will apply all files under the k
 
 # Change Log
 
+## v2.0.1
+
+- Fix to get resource name
+- Add yq in background
+
 ## v2.0.0
 
 - Added possibilitie to add path (env FILES_PATH) to apply multiple files
