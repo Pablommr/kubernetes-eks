@@ -160,6 +160,10 @@ In this setup, with FILES_PATH: kubernetes, you will apply all files under the k
 
 # Change Log
 
+## v2.0.2
+
+- Fix files validation in SUBPATH
+
 ## v2.0.1
 
 - Fix to get resource name
