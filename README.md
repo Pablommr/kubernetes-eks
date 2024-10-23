@@ -56,8 +56,11 @@ Environment variable containing the base64-encoded kubeconfig data. Pay attentio
 ### `KUBE_YAML` or `FILES_PATH`
 
 One of them (or both) must be set. <br><br>
-KUBE_YAML is the path of <b>file</b> to file used to create/update the resource. This env can be an array with more then 1 file. (I.e. kubernetes/deployment.yml,artifacts/configmap.yaml )<br>
-FILES_PATH is the path of the <b>directory</b> where the files are located. All files in this directory will be applied.<br><br>
+
+KUBE_YAML is the path of <b>file</b> to file used to create/update the resource. This env can be an array with more then 1 file. (I.e. kubernetes/deployment.yml,artifacts/configmap.yaml )<br><br>
+
+FILES_PATH is the path of the <b>directory</b> where the files are located. All files in this current directory will be applied.<br><br>
+
 The files must be with *.yaml or *.yml extensions.
 
 <br>
@@ -144,7 +147,7 @@ jobs:
         uses: Pablommr/kubernetes-eks@v2.0.1
         env:
           FILES_PATH: kubernetes
-          KUBE_YAML: kubernetes/envs/configmap.yaml
+          KUBE_YAML: kubernetes/envs/prod/configmap.yaml
           SUBPATH: false #Defaul value
           ENVSUBST: true
           KUBE_ROLLOUT: true

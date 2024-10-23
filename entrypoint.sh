@@ -71,11 +71,19 @@ check_directories_and_files() {
   local dirs=("$@")
   for dir in "${dirs[@]}"; do
     if [ -d "$dir" ]; then
-      # Verifica se há pelo menos um arquivo .yaml ou .yml no diretório
-      if ! find "$dir" -maxdepth 1 -type f \( -name "*.yaml" -o -name "*.yml" \) | grep -q .; then
-        echo "No files .yaml or .yml found in dir: $dir"
-        echo "No files .yaml or .yml found in dir: $dir" >> $GITHUB_STEP_SUMMARY
-        exit 1
+      # Verifica se há pelo menos um arquivo .yaml ou .yml no diretório ou subdiretório
+      if [ "$SUBPATH" == "true" ]; then
+        if ! find "$dir" -type f \( -name "*.yaml" -o -name "*.yml" \) | grep -q .; then
+          echo "No files .yaml or .yml found in dir: $dir"
+          echo "No files .yaml or .yml found in dir: $dir" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+      else
+        if ! find "$dir" -maxdepth 1 -type f \( -name "*.yaml" -o -name "*.yml" \) | grep -q .; then
+          echo "No files .yaml or .yml found in dir: $dir"
+          echo "No files .yaml or .yml found in dir: $dir" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
       fi
     else
       echo "Path $dir doen't exist."
