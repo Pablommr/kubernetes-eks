@@ -182,6 +182,7 @@ createJsonFiles () {
 envSubstitution () {
   local file="$1"
 
+  echo "============================="
   echo "Change envs in file: $file"
 
   for ENV_VAR in $(env |cut -f 1 -d =); do
