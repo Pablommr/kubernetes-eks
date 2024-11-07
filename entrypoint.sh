@@ -358,6 +358,8 @@ for i in ${FILES_YAML[@]}; do
       else
         createJsonFiles $i
       fi
+    else
+      createJsonFiles $i
     fi
   fi
 done
