@@ -45,6 +45,14 @@ if [ "$KUBE_ROLLOUT" != "true" ] && [ "$KUBE_ROLLOUT" != "false" ]; then
   KUBE_ROLLOUT=true
   echo 'Env KUBE_ROLLOUT is empty! Using default=true.'
 fi
+if [ -z "$KUBE_ROLLOUT_TIMEOUT" ]; then
+  KUBE_ROLLOUT_TIMEOUT='20m'
+  echo 'Env KUBE_ROLLOUT_TIMEOUT is empty! Using default 20m.'
+fi
+if ! [[ $KUBE_ROLLOUT_TIMEOUT =~ ^[0-9]+[smh]$ ]]; then
+    echo "Erro: O KUBE_ROLLOUT_TIMEOUT must be in time format. (i.e.: 60s, 5m, 1h)."
+    exit 1
+fi
 
 echo ""
 
@@ -240,19 +248,47 @@ applyFile () {
     echo "Arquivo aplicado com sucesso: $file"
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
   fi
-
+  
   #Verify and execute rollout
-  if [ "$kube_rollout" == true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
-    echo ""
-    echo "Applying rollout:"
-    kubectl rollout restart --filename $file
-    echo ""
-    echo "Checking rollout status:"
-    kubectl rollout status --filename $file
-  elif [ "$kube_rollout" = true ] && ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
-    echo ""
-    echo "Checking rollout status:"
-    kubectl rollout status --filename $file
+  if [ "$kube_rollout" == true ]; then
+
+    #Timestamp do início da execução do kuberollout
+    local kube_rollout_start_time=$(date +%s)
+
+    if [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
+      echo ""
+      echo "Applying rollout:"
+      kubectl rollout restart --filename $file
+      echo ""
+      echo "Checking rollout status:"
+      kubectl rollout status --filename $file --timeout=$KUBE_ROLLOUT_TIMEOUT
+      local kube_rollout_status=$?  # Captura o código de saída do último comando
+    elif ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
+      echo ""
+      echo "Checking rollout status:"
+      kubectl rollout status --filename $file --timeout=$KUBE_ROLLOUT_TIMEOUT
+      local kube_rollout_status=$?  # Captura o código de saída do último comando
+    fi
+
+    #Timestamp do fim da execução do kuberollout
+    local kube_rollout_end_time=$(date +%s)
+
+    # Calcula o tempo total de execução em segundos
+    local kube_rollout_execution_time=$((kube_rollout_start_time - kube_rollout_end_time))
+    
+    # Converte o tempo total em minutos e segundos
+    local minutes=$((kube_rollout_execution_time / 60))
+    local seconds=$((kube_rollout_execution_time % 60))
+    
+    # Verifica se o comando foi bem-sucedido
+    if [ $kube_rollout_status -eq 0 ]; then
+        echo "O rollout foi bem-sucedido."
+    else
+        echo "O rollout falhou ou atingiu o timeout."
+    fi
+    
+    # Exibe o tempo total de execução no formato Xm:Xs
+    echo "Tempo de execução: ${minutes}m:${seconds}s."
   fi
 
   echo "$KUBE_APPLY"
