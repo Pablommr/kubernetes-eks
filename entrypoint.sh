@@ -347,11 +347,11 @@ for i in ${FILES_YAML[@]}; do
       file_no_path=$(echo "$i" | sed "s|^$path/||")
       #Verifica se o arquivo a ser aplicado tem em seu path um dos path (em caso de vetor) informado pelo usuário
       if [ "$i" != "$file_no_path" ];then
-        echo "DEBUG file_no_path: $file_no_path | i: $i"
         qtd_subpath=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
+      else
+        qtd_subpath=0
       fi
     done
-    echo "DEBUG qtd_subpath: $qtd_subpath"
     #Verifica se tem mais sub-diretórios além do informado
     if [ $qtd_subpath -gt 0 ]; then
       echo "SUBPATH=false. Ignoring file: $i"
