@@ -350,8 +350,8 @@ for i in ${FILES_YAML[@]}; do
         qtd_subpath=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
       fi
     done
-    #se FILES_PATH é nulo, indica que só arquivos foram passados e não precisa chamar createJsonFiles
-    if [ -z "$FILES_PATH" ]; then
+    #se FILES_PATH não é nulo, pois se for, não precisa chamar createJsonFiles
+    if [ -n "$FILES_PATH" ]; then
       #Verifica se tem mais sub-diretórios além do informado
       if [ $qtd_subpath -gt 0 ]; then
         echo "SUBPATH=false. Ignoring file: $i"
