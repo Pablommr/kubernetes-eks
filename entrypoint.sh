@@ -229,9 +229,12 @@ applyFile () {
     echo -n "| | " >> $GITHUB_STEP_SUMMARY
   fi
 
+  #Resource Name
+  local resource_name=$(echo -n "$(yq eval '.metadata.name' $file)")
+  echo -n "$resource_name" >> $GITHUB_STEP_SUMMARY
+
   #Applying artifact
   echo "Applying file: $file"
-  echo -n "$(yq eval '.metadata.name' $file)" >> $GITHUB_STEP_SUMMARY
   echo "Original file: $print_name"
   echo -n " | $print_name" >> $GITHUB_STEP_SUMMARY
   echo "-----------------------------"
@@ -253,12 +256,12 @@ applyFile () {
   
   #Verify and execute rollout
   if [ "$kube_rollout" == true ]; then
+    echo "============================="
 
     #Timestamp do início da execução do kuberollout
     local kube_rollout_start_time=$(date +%s)
 
     if [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
-      echo ""
       echo "Applying rollout:"
       kubectl rollout restart --filename $file
       echo ""
@@ -266,7 +269,6 @@ applyFile () {
       kubectl rollout status --filename $file --timeout=$KUBE_ROLLOUT_TIMEOUT
       local kube_rollout_status=$?  # Captura o código de saída do último comando
     elif ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
-      echo ""
       echo "Checking rollout status:"
       kubectl rollout status --filename $file --timeout=$KUBE_ROLLOUT_TIMEOUT
       local kube_rollout_status=$?  # Captura o código de saída do último comando
@@ -285,9 +287,13 @@ applyFile () {
     # Verifica se o comando foi bem-sucedido
     if [ $kube_rollout_status -eq 0 ]; then
         echo "O rollout foi bem-sucedido."
+        local kube_rollout_mark="Passed :white_check_mark:"
     else
         echo "O rollout falhou ou atingiu o timeout."
+        local kube_rollout_mark="Failed :x:"
     fi
+
+    KUBE_ROLLOUT_JSON+=("{"file":"$file","resource_name":"$resource_name","time":"${minutes}m:${seconds}s","status":"$kube_rollout_mark"}")
     
     # Exibe o tempo total de execução no formato Xm:Xs
     echo "Tempo de execução: ${minutes}m:${seconds}s."
@@ -305,6 +311,9 @@ applyFile () {
 #Transformando os inputs do githubaciotns em array
 IFS=',' read -r -a FT_FILES_PATH <<< "$FILES_PATH"
 IFS=',' read -r -a FT_KUBE_YAML <<< "$KUBE_YAML"
+
+#Recebe os arquivos e os status dos rollouts
+KUBE_ROLLOUT_JSON=()
 
 
 #Valida se os paths existem
@@ -427,3 +436,6 @@ done
 
 echo ""
 echo "All done! =D"
+
+
+echo "DEBUG KUBE_ROLLOUT_JSON: ${KUBE_ROLLOUT_JSON[@]}"
