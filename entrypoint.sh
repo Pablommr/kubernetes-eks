@@ -350,6 +350,7 @@ for i in ${FILES_YAML[@]}; do
         qtd_subpath=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
       fi
     done
+    echo "DEBUG qtd_subpath: $qtd_subpath"
     #Verifica se tem mais sub-diretórios além do informado
     if [ $qtd_subpath -gt 0 ]; then
       echo "SUBPATH=false. Ignoring file: $i"
