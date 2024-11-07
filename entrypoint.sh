@@ -332,6 +332,8 @@ FILES_JSON='{}'
 #Adiciona arquivos individuais setados pelo usuário
 FILES_YAML+=("${FT_KUBE_YAML[@]}")
 
+echo "DEBUG FILES_YAML: ${FILES_YAML[@]}"
+
 #Percorre os arquivos para montar o FILES_JSON com os arquivos
 for i in ${FILES_YAML[@]}; do
 
@@ -339,14 +341,15 @@ for i in ${FILES_YAML[@]}; do
     #cria Json com todos os arquivos do diretório e sub-diretório
     createJsonFiles $i
   else
+    echo "DEBUG ELSE"
     #Quantidade total de subpath no arquivo a ser aplicado
     qtd_path_file=$(echo "$i" | tr -cd '/' | wc -c | tr -d ' ')
     #Percorre cada arquivo para contar a quantidade de path
+    echo "DEBUG FT_FILES_PATH: ${FT_FILES_PATH[@]}"
     for path in "${FT_FILES_PATH[@]}"; do
       #Retira o path informado pelo usuário do path total do arquivo
       file_no_path=$(echo "$i" | sed "s|^$path/||")
       #Verifica se o arquivo a ser aplicado tem em seu path um dos path (em caso de vetor) informado pelo usuário
-      echo "DEBUG file_no_path: $file_no_path | i: $i"
       if [ "$i" != "$file_no_path" ];then
         qtd_subpath=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
       fi
