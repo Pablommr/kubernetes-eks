@@ -195,6 +195,7 @@ artifactType () {
   local type="$1"
   local kube_rollout="$2"
 
+  echo "============================="
   echo "Type: $type"
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
 
@@ -232,7 +233,7 @@ applyFile () {
   echo -n "$(yq eval '.metadata.name' $file)" >> $GITHUB_STEP_SUMMARY
   echo "Original file: $print_name"
   echo -n " | $print_name" >> $GITHUB_STEP_SUMMARY
-  echo =============================
+  echo "-----------------------------"
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   KUBE_EXIT_CODE=$?
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
