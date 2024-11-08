@@ -287,13 +287,13 @@ applyFile () {
     # Verifica se o comando foi bem-sucedido
     if [ $kube_rollout_status -eq 0 ]; then
         echo "O rollout foi bem-sucedido."
-        local kube_rollout_mark="Passed :white_check_mark:"
+        local kube_rollout_mark=true
     else
         echo "O rollout falhou ou atingiu o timeout."
-        local kube_rollout_mark="Failed :x:"
+        local kube_rollout_mark=false
     fi
 
-    KUBE_ROLLOUT_JSON+=("{"file":"$file","resource_name":"$resource_name","time":"${minutes}m:${seconds}s","status":"$kube_rollout_mark"}")
+    KUBE_ROLLOUT_JSON+=("{\"file\":\"$file\",\"resource_name\":\"$resource_name\",\"time\":\"${minutes}m:${seconds}s\",\"status\":$kube_rollout_mark}")
     
     # Exibe o tempo total de execução no formato Xm:Xs
     echo "Tempo de execução: ${minutes}m:${seconds}s."
@@ -434,8 +434,30 @@ for type in ${last_apply[@]}; do
   fi
 done
 
+#Finaliza a primeira tabela
+echo "" >> $GITHUB_STEP_SUMMARY
+
+echo "| File        | Resource Name  | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
+echo "|-------------|----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
+
+#Iterage sobre o JSON para preencher a tabela
+for e in ${KUBE_ROLLOUT_JSON[@]}; do
+
+  kr_file="$(echo -n $e | jq -r .file)"
+  kr_resource_name="$(echo -n $e | jq -r .resource_name)"
+  kr_time="$(echo -n $e | jq -r .time)"
+  kr_status="$(echo -n $e | jq -r .status)"
+
+  echo -n "| $kr_file "
+  echo -n "| $kr_resource_name "
+  echo -n "| $kr_time "
+  if $kr_status; then
+    echo -n "| "Passed :white_check_mark:" |"
+  else
+    echo -n "| Failed :x: |"
+  fi
+
+done
+
 echo ""
 echo "All done! =D"
-
-
-echo "DEBUG KUBE_ROLLOUT_JSON: ${KUBE_ROLLOUT_JSON[@]}"
