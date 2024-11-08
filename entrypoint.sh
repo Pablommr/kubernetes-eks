@@ -212,7 +212,7 @@ artifactType () {
     fi
 
     #Apply file
-    applyFile $file $print_name $tmp_count $kube_rollout
+    applyFile $file $print_name $tmp_count $type $kube_rollout
     #Incrementa o Count
     tmp_count=$((tmp_count + 1))
   done
@@ -222,7 +222,8 @@ applyFile () {
   local file="$1"
   local print_name="$2"
   local tmp_count="$3"
-  local kube_rollout="$4"
+  local type="$4"
+  local kube_rollout="$5"
 
   #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
   if [ $tmp_count -gt 0 ]; then
@@ -295,7 +296,7 @@ applyFile () {
         local kube_rollout_mark=false
     fi
 
-    KUBE_ROLLOUT_JSON+=("{\"file\":\"$file\",\"resource_name\":\"$resource_name\",\"time\":\"${minutes}m:${seconds}s\",\"status\":$kube_rollout_mark}")
+    KUBE_ROLLOUT_JSON+=("{\"type\":\"$type\",\"file\":\"$file\",\"resource_name\":\"$resource_name\",\"time\":\"${minutes}m:${seconds}s\",\"status\":$kube_rollout_mark}")
     
     # Exibe o tempo total de execução no formato Xm:Xs
     echo "Tempo de execução: ${minutes}m:${seconds}s."
@@ -447,19 +448,21 @@ if [ "$KUBE_ROLLOUT" == "true" ]; then
   
   echo "## Rollout Status" >> $GITHUB_STEP_SUMMARY
   
-  echo "| File        | Resource Name  | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
-  echo "|-------------|----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
+  echo "| Type        | Resource Name  | File            | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
+  echo "|-------------|----------------|-----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
 
   #Iterage sobre o JSON para preencher a tabela
   for e in ${KUBE_ROLLOUT_JSON[@]}; do
   
-    kr_file="$(echo -n $e | jq -r .file)"
+    kr_type="$(echo -n $e | jq -r .type)"
     kr_resource_name="$(echo -n $e | jq -r .resource_name)"
+    kr_file="$(echo -n $e | jq -r .file)"
     kr_time="$(echo -n $e | jq -r .time)"
     kr_status="$(echo -n $e | jq -r .status)"
   
-    echo -n "| $kr_file " >> $GITHUB_STEP_SUMMARY
+    echo -n "| $kr_type " >> $GITHUB_STEP_SUMMARY
     echo -n "| $kr_resource_name " >> $GITHUB_STEP_SUMMARY
+    echo -n "| $kr_file " >> $GITHUB_STEP_SUMMARY
     echo -n "| $kr_time " >> $GITHUB_STEP_SUMMARY
     if $kr_status; then
       echo "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
