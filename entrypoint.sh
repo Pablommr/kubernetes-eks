@@ -449,8 +449,6 @@ if [ "$KUBE_ROLLOUT" == "true" ]; then
   
   echo "| File        | Resource Name  | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
   echo "|-------------|----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
-  
-  echo "DEBUG KUBE_ROLLOUT_JSON: ${KUBE_ROLLOUT_JSON[@]}"
 
   #Iterage sobre o JSON para preencher a tabela
   for e in ${KUBE_ROLLOUT_JSON[@]}; do
@@ -464,9 +462,9 @@ if [ "$KUBE_ROLLOUT" == "true" ]; then
     echo -n "| $kr_resource_name " >> $GITHUB_STEP_SUMMARY
     echo -n "| $kr_time " >> $GITHUB_STEP_SUMMARY
     if $kr_status; then
-      echo -n "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
+      echo "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
     else
-      echo -n "| Failed :x: |" >> $GITHUB_STEP_SUMMARY
+      echo "| Failed :x: |" >> $GITHUB_STEP_SUMMARY
     fi
   
   done
