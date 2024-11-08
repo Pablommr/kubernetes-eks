@@ -438,31 +438,36 @@ done
 #Finaliza a primeira tabela
 echo "" >> $GITHUB_STEP_SUMMARY
 
-echo "---" >> $GITHUB_STEP_SUMMARY
-
-echo "## Rollout Status" >> $GITHUB_STEP_SUMMARY
-
-echo "| File        | Resource Name  | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
-echo "|-------------|----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
-
-#Iterage sobre o JSON para preencher a tabela
-for e in ${KUBE_ROLLOUT_JSON[@]}; do
-
-  kr_file="$(echo -n $e | jq -r .file)"
-  kr_resource_name="$(echo -n $e | jq -r .resource_name)"
-  kr_time="$(echo -n $e | jq -r .time)"
-  kr_status="$(echo -n $e | jq -r .status)"
-
-  echo -n "| $kr_file " >> $GITHUB_STEP_SUMMARY
-  echo -n "| $kr_resource_name " >> $GITHUB_STEP_SUMMARY
-  echo -n "| $kr_time " >> $GITHUB_STEP_SUMMARY
-  if $kr_status; then
-    echo -n "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
-  else
-    echo -n "| Failed :x: |" >> $GITHUB_STEP_SUMMARY
-  fi
-
-done
+#Verifica KUBE_ROLLOUT para printar tabela
+if [ "$KUBE_ROLLOUT" == "true" ]; then
+  
+  echo "---" >> $GITHUB_STEP_SUMMARY
+  
+  echo "## Rollout Status" >> $GITHUB_STEP_SUMMARY
+  
+  echo "| File        | Resource Name  | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
+  echo "|-------------|----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
+  
+  #Iterage sobre o JSON para preencher a tabela
+  for e in ${KUBE_ROLLOUT_JSON[@]}; do
+  
+    kr_file="$(echo -n $e | jq -r .file)"
+    kr_resource_name="$(echo -n $e | jq -r .resource_name)"
+    kr_time="$(echo -n $e | jq -r .time)"
+    kr_status="$(echo -n $e | jq -r .status)"
+  
+    echo -n "| $kr_file " >> $GITHUB_STEP_SUMMARY
+    echo -n "| $kr_resource_name " >> $GITHUB_STEP_SUMMARY
+    echo -n "| $kr_time " >> $GITHUB_STEP_SUMMARY
+    if $kr_status; then
+      echo -n "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
+    else
+      echo -n "| Failed :x: |" >> $GITHUB_STEP_SUMMARY
+    fi
+  
+  done
+  
+fi
 
 echo ""
 echo "All done! =D"
