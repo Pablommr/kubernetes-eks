@@ -296,7 +296,7 @@ applyFile () {
         local kube_rollout_mark=false
     fi
 
-    KUBE_ROLLOUT_JSON+=("{\"type\":\"$type\",\"file\":\"$file\",\"resource_name\":\"$resource_name\",\"time\":\"${minutes}m:${seconds}s\",\"status\":$kube_rollout_mark}")
+    KUBE_ROLLOUT_JSON+=("{\"type\":\"$type\",\"file\":\"$print_name\",\"resource_name\":\"$resource_name\",\"time\":\"${minutes}m:${seconds}s\",\"status\":$kube_rollout_mark}")
     
     # Exibe o tempo total de execução no formato Xm:Xs
     echo "Tempo de execução: ${minutes}m:${seconds}s."
