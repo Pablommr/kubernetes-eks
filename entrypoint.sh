@@ -45,6 +45,14 @@ if [ "$KUBE_ROLLOUT" != "true" ] && [ "$KUBE_ROLLOUT" != "false" ]; then
   KUBE_ROLLOUT=true
   echo 'Env KUBE_ROLLOUT is empty! Using default=true.'
 fi
+if [ -z "$KUBE_ROLLOUT_TIMEOUT" ]; then
+  KUBE_ROLLOUT_TIMEOUT='20m'
+  echo 'Env KUBE_ROLLOUT_TIMEOUT is empty! Using default 20m.'
+fi
+if ! [[ $KUBE_ROLLOUT_TIMEOUT =~ ^[0-9]+[smh]$ ]]; then
+    echo "Erro: O KUBE_ROLLOUT_TIMEOUT must be in time format. (i.e.: 60s, 5m, 1h)."
+    exit 1
+fi
 
 echo ""
 
@@ -174,6 +182,7 @@ createJsonFiles () {
 envSubstitution () {
   local file="$1"
 
+  echo "============================="
   echo "Change envs in file: $file"
 
   for ENV_VAR in $(env |cut -f 1 -d =); do
@@ -187,6 +196,7 @@ artifactType () {
   local type="$1"
   local kube_rollout="$2"
 
+  echo "============================="
   echo "Type: $type"
   echo -n "| $type | " >> $GITHUB_STEP_SUMMARY
 
@@ -202,7 +212,7 @@ artifactType () {
     fi
 
     #Apply file
-    applyFile $file $print_name $tmp_count $kube_rollout
+    applyFile $file $print_name $tmp_count $type $kube_rollout
     #Incrementa o Count
     tmp_count=$((tmp_count + 1))
   done
@@ -212,19 +222,23 @@ applyFile () {
   local file="$1"
   local print_name="$2"
   local tmp_count="$3"
-  local kube_rollout="$4"
+  local type="$4"
+  local kube_rollout="$5"
 
   #Printa em branco na primeira tabela caso seja outro arquivo do mesmo tipo
   if [ $tmp_count -gt 0 ]; then
     echo -n "| | " >> $GITHUB_STEP_SUMMARY
   fi
 
+  #Resource Name
+  local resource_name=$(echo -n "$(yq eval '.metadata.name' $file)")
+  echo -n "$resource_name" >> $GITHUB_STEP_SUMMARY
+
   #Applying artifact
   echo "Applying file: $file"
-  echo -n "$(yq eval '.metadata.name' $file)" >> $GITHUB_STEP_SUMMARY
   echo "Original file: $print_name"
   echo -n " | $print_name" >> $GITHUB_STEP_SUMMARY
-  echo "==========="
+  echo "-----------------------------"
   KUBE_APPLY=$(kubectl apply -f $file 2>&1)
   KUBE_EXIT_CODE=$?
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
@@ -240,23 +254,57 @@ applyFile () {
     echo "Arquivo aplicado com sucesso: $file"
     echo " | Passed :white_check_mark: |" >> $GITHUB_STEP_SUMMARY
   fi
-
+  
   #Verify and execute rollout
-  if [ "$kube_rollout" == true ] && [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
+  if [ "$kube_rollout" == true ]; then
+    echo "============================="
     echo ""
-    echo "Applying rollout:"
-    kubectl rollout restart --filename $file
-    echo ""
-    echo "Checking rollout status:"
-    kubectl rollout status --filename $file
-  elif [ "$kube_rollout" = true ] && ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
-    echo ""
-    echo "Checking rollout status:"
-    kubectl rollout status --filename $file
+    echo "============================="
+
+    #Timestamp do início da execução do kuberollout
+    local kube_rollout_start_time=$(date +%s)
+
+    if [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "unchanged" ]; then
+      echo "Applying rollout:"
+      kubectl rollout restart --filename $file
+      echo ""
+      echo "Checking rollout status:"
+      kubectl rollout status --filename $file --timeout=$KUBE_ROLLOUT_TIMEOUT
+      local kube_rollout_status=$?  # Captura o código de saída do último comando
+    elif ([ "$(echo $KUBE_APPLY |sed 's/.* //')" == "configured" ] || [ "$(echo $KUBE_APPLY |sed 's/.* //')" == "created" ]); then
+      echo "Checking rollout status:"
+      kubectl rollout status --filename $file --timeout=$KUBE_ROLLOUT_TIMEOUT
+      local kube_rollout_status=$?  # Captura o código de saída do último comando
+    fi
+
+    #Timestamp do fim da execução do kuberollout
+    local kube_rollout_end_time=$(date +%s)
+
+    # Calcula o tempo total de execução em segundos
+    local kube_rollout_execution_time=$((kube_rollout_end_time - kube_rollout_start_time))
+    
+    # Converte o tempo total em minutos e segundos
+    local minutes=$((kube_rollout_execution_time / 60))
+    local seconds=$((kube_rollout_execution_time % 60))
+    
+    # Verifica se o comando foi bem-sucedido
+    if [ $kube_rollout_status -eq 0 ]; then
+        echo "O rollout foi bem-sucedido."
+        local kube_rollout_mark=true
+    else
+        echo "O rollout falhou ou atingiu o timeout."
+        local kube_rollout_mark=false
+    fi
+
+    KUBE_ROLLOUT_JSON+=("{\"type\":\"$type\",\"file\":\"$print_name\",\"resource_name\":\"$resource_name\",\"time\":\"${minutes}m:${seconds}s\",\"status\":$kube_rollout_mark}")
+    
+    # Exibe o tempo total de execução no formato Xm:Xs
+    echo "Tempo de execução: ${minutes}m:${seconds}s."
   fi
 
   echo "$KUBE_APPLY"
   echo "============================="
+  echo ""
 }
 
 ###===========================================================
@@ -266,6 +314,9 @@ applyFile () {
 #Transformando os inputs do githubaciotns em array
 IFS=',' read -r -a FT_FILES_PATH <<< "$FILES_PATH"
 IFS=',' read -r -a FT_KUBE_YAML <<< "$KUBE_YAML"
+
+#Recebe os arquivos e os status dos rollouts
+KUBE_ROLLOUT_JSON=()
 
 
 #Valida se os paths existem
@@ -314,9 +365,14 @@ for i in ${FILES_YAML[@]}; do
         qtd_subpath=$(echo "$file_no_path" | tr -cd '/' | wc -c | tr -d ' ')
       fi
     done
-    #Verifica se tem mais sub-diretórios além do informado
-    if [ $qtd_subpath -gt 0 ]; then
-      echo "SUBPATH=false. Ignoring file: $i"
+    #se FILES_PATH não é nulo, pois se for, não precisa chamar createJsonFiles
+    if [ -n "$FILES_PATH" ]; then
+      #Verifica se tem mais sub-diretórios além do informado
+      if [ $qtd_subpath -gt 0 ]; then
+        echo "SUBPATH=false. Ignoring file: $i"
+      else
+        createJsonFiles $i
+      fi
     else
       createJsonFiles $i
     fi
@@ -325,6 +381,7 @@ done
 
 echo ""
 
+echo "## Deploy Status" >> $GITHUB_STEP_SUMMARY
 
 echo "| Type        | Resource Name  | File    | Status  |" >> $GITHUB_STEP_SUMMARY
 echo "|-------------|----------------|---------|---------|" >> $GITHUB_STEP_SUMMARY
@@ -380,6 +437,42 @@ for type in ${last_apply[@]}; do
     artifactType $type false
   fi
 done
+
+#Finaliza a primeira tabela
+echo "" >> $GITHUB_STEP_SUMMARY
+
+#Verifica KUBE_ROLLOUT para printar tabela
+if [ "$KUBE_ROLLOUT" == "true" ]; then
+  
+  echo "---" >> $GITHUB_STEP_SUMMARY
+  
+  echo "## Rollout Status" >> $GITHUB_STEP_SUMMARY
+  
+  echo "| Type        | Resource Name  | File            | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
+  echo "|-------------|----------------|-----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
+
+  #Iterage sobre o JSON para preencher a tabela
+  for e in ${KUBE_ROLLOUT_JSON[@]}; do
+  
+    kr_type="$(echo -n $e | jq -r .type)"
+    kr_resource_name="$(echo -n $e | jq -r .resource_name)"
+    kr_file="$(echo -n $e | jq -r .file)"
+    kr_time="$(echo -n $e | jq -r .time)"
+    kr_status="$(echo -n $e | jq -r .status)"
+  
+    echo -n "| $kr_type " >> $GITHUB_STEP_SUMMARY
+    echo -n "| $kr_resource_name " >> $GITHUB_STEP_SUMMARY
+    echo -n "| $kr_file " >> $GITHUB_STEP_SUMMARY
+    echo -n "| $kr_time " >> $GITHUB_STEP_SUMMARY
+    if $kr_status; then
+      echo "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
+    else
+      echo "| Failed :x: |" >> $GITHUB_STEP_SUMMARY
+    fi
+  
+  done
+  
+fi
 
 echo ""
 echo "All done! =D"
