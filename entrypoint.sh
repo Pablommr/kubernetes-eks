@@ -450,6 +450,8 @@ if [ "$KUBE_ROLLOUT" == "true" ]; then
   echo "| File        | Resource Name  | Execution Time  | Status  |" >> $GITHUB_STEP_SUMMARY
   echo "|-------------|----------------|-----------------|---------|" >> $GITHUB_STEP_SUMMARY
   
+  echo "DEBUG KUBE_ROLLOUT_JSON: ${KUBE_ROLLOUT_JSON[@]}"
+
   #Iterage sobre o JSON para preencher a tabela
   for e in ${KUBE_ROLLOUT_JSON[@]}; do
   
