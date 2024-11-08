@@ -281,7 +281,7 @@ applyFile () {
     local kube_rollout_end_time=$(date +%s)
 
     # Calcula o tempo total de execução em segundos
-    local kube_rollout_execution_time=$((kube_rollout_start_time - kube_rollout_end_time))
+    local kube_rollout_execution_time=$((kube_rollout_end_time - kube_rollout_start_time))
     
     # Converte o tempo total em minutos e segundos
     local minutes=$((kube_rollout_execution_time / 60))
