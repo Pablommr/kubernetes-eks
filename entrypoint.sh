@@ -257,6 +257,8 @@ applyFile () {
   #Verify and execute rollout
   if [ "$kube_rollout" == true ]; then
     echo "============================="
+    echo ""
+    echo "============================="
 
     #Timestamp do início da execução do kuberollout
     local kube_rollout_start_time=$(date +%s)
