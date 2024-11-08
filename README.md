@@ -149,7 +149,7 @@ jobs:
       - name: Checkout 
         uses: actions/checkout@v4
       - name: Deploy
-        uses: Pablommr/kubernetes-eks@v2.0.1
+        uses: Pablommr/kubernetes-eks@v2.1.0
         env:
           FILES_PATH: kubernetes
           KUBE_YAML: kubernetes/envs/prod/configmap.yaml
