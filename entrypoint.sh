@@ -294,11 +294,6 @@ applyFile () {
     else
         echo "O rollout falhou ou atingiu o timeout."
         local kube_rollout_mark=false
-        KUBE_ROLLOUT_FAILED=true
-        #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
-        if ! $CONTINUE_IF_FAIL; then
-          exit 1
-        fi
     fi
 
     KUBE_ROLLOUT_JSON+=("{\"type\":\"$type\",\"file\":\"$print_name\",\"resource_name\":\"$resource_name\",\"time\":\"${minutes}m:${seconds}s\",\"status\":$kube_rollout_mark}")
@@ -475,6 +470,11 @@ if [ "$KUBE_ROLLOUT" == "true" ]; then
       echo "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
     else
       echo "| Failed :x: |" >> $GITHUB_STEP_SUMMARY
+      KUBE_ROLLOUT_FAILED=true
+      #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
+      if ! $CONTINUE_IF_FAIL; then
+        exit 1
+      fi
     fi
   
   done
