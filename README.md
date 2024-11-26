@@ -167,7 +167,7 @@ In this setup, with FILES_PATH: kubernetes, you will apply all files under the k
 
 ## v2.1.1
 
-- Add broke pipeline in case of rollout failed
+- Add to broke pipeline in case of rollout failed
 
 ## v2.1.0
 
