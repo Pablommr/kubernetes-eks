@@ -244,9 +244,9 @@ applyFile () {
   if [ $KUBE_EXIT_CODE -ne 0 ]; then
     echo "Erro ao aplicar o arquivo: $file"
     echo " | Failed :x: |" >> $GITHUB_STEP_SUMMARY
-    #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
     echo "KUBE_EXIT_CODE: $KUBE_EXIT_CODE"
     echo "KUBECTL_OUTPUT: $KUBE_APPLY"
+    #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
     if ! $CONTINUE_IF_FAIL; then
       exit 1
     fi
@@ -318,6 +318,8 @@ IFS=',' read -r -a FT_KUBE_YAML <<< "$KUBE_YAML"
 #Recebe os arquivos e os status dos rollouts
 KUBE_ROLLOUT_JSON=()
 
+#Recebe o status do rollout
+KUBE_ROLLOUT_FAILED=false
 
 #Valida se os paths existem
 if [ ${#FT_FILES_PATH[@]} -gt 0 ]; then
@@ -468,10 +470,20 @@ if [ "$KUBE_ROLLOUT" == "true" ]; then
       echo "| "Passed :white_check_mark:" |" >> $GITHUB_STEP_SUMMARY
     else
       echo "| Failed :x: |" >> $GITHUB_STEP_SUMMARY
+      KUBE_ROLLOUT_FAILED=true
+      #Para a action caso o esteja setado CONTINUE_IF_FAIL=false
+      if ! $CONTINUE_IF_FAIL; then
+        exit 1
+      fi
     fi
   
   done
   
+fi
+
+#Quebra a pipe caso algum rollout tenha falhado
+if $KUBE_ROLLOUT_FAILED; then
+  exit 1
 fi
 
 echo ""

@@ -21,7 +21,7 @@ jobs:
       - name: Checkout 
         uses: actions/checkout@v4
       - name: Deployment
-        uses: Pablommr/kubernetes-eks@v2.1.0
+        uses: Pablommr/kubernetes-eks@v2.1.1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -94,7 +94,7 @@ Whether to watch the status of the latest rollout until it's done. The rollout o
 ### `KUBE_ROLLOUT_TIMEOUT`
 (String)
 
-Timeout to KUBE_ROLLOUT. This env must be in time format. (i.e.: 60s, 5m, 1h) and KUBE_ROLLOUT_TIMEOUT must be true. Defaul value is 20m.
+Timeout to KUBE_ROLLOUT. This env must be in time format. (i.e.: 60s, 5m, 1h) and KUBE_ROLLOUT must be true. Defaul value is 20m.
 
 <br>
 
@@ -149,7 +149,7 @@ jobs:
       - name: Checkout 
         uses: actions/checkout@v4
       - name: Deploy
-        uses: Pablommr/kubernetes-eks@v2.1.0
+        uses: Pablommr/kubernetes-eks@v2.1.1
         env:
           FILES_PATH: kubernetes
           KUBE_YAML: kubernetes/envs/prod/configmap.yaml
@@ -164,6 +164,10 @@ In this setup, with FILES_PATH: kubernetes, you will apply all files under the k
 <br>
 
 # Change Log
+
+## v2.1.1
+
+- Add to broke pipeline in case of rollout failed
 
 ## v2.1.0
 
